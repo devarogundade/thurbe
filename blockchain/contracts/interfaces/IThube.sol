@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity <=0.8.24;
 
-interface IzkStream {
+interface IThube {
     event StreamPaused(bytes32 streamId);
     event StreamResumed(bytes32 streamId);
     event StreamEnded(bytes32 streamId);

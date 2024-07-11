@@ -59,7 +59,7 @@ export async function addToWallet(token: Token) {
                     address: token.tokenId,
                     symbol: token.symbol,
                     decimals: '18',
-                    image: 'https://zkstream.xyz/images/' + token.image + '.png',
+                    image: 'https://thube.xyz/images/' + token.image + '.png',
                 },
             },
         });

@@ -3,9 +3,9 @@ import { defaultWagmiConfig } from '@web3modal/wagmi';
 import { thetaTestnet } from './theta';
 
 const metadata = {
-    name: 'zkStream',
-    description: 'zkStream',
-    url: 'https://zkstream.xyz',
+    name: 'Thube',
+    description: 'Thube',
+    url: 'https://thube.xyz',
     icons: ['https://avatars.githubusercontent.com/u/37784886']
 };
 

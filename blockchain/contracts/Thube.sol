@@ -3,19 +3,20 @@ pragma solidity <=0.8.24;
 
 import {Data} from "./libraries/Data.sol";
 import {Hash} from "./libraries/Hash.sol";
-import {IzkStream} from "./interfaces/IzkStream.sol";
+import {IThube} from "./interfaces/IThube.sol";
 import {DRMProvider} from "./providers/DRMProvider.sol";
 import {TipProvider} from "./providers/TipProvider.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
-contract zkStream is IzkStream, AccessControl, Pausable {
+contract Thube is IThube, AccessControl, Pausable {
     DRMProvider private _drmProvider;
     TipProvider private _tipProvider;
 
     mapping(bytes32 => Data.Stream) private _streams;
 
     constructor() {
+        // Create providers.
         _drmProvider = new DRMProvider(address(this));
         _tipProvider = new TipProvider(address(this));
 
