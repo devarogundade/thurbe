@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { Account } from './database/schemas/account';
 import { Stream } from './database/schemas/stream';
 import { Paged } from './types';
+import { Video } from './database/schemas/video';
 
 @Controller()
 export class AppController {
@@ -72,6 +73,32 @@ export class AppController {
     );
   }
 
+  @Post('/upload-video')
+  uploadVideo(
+    @Body() dto: Video
+  ): Promise<Video | null> {
+    return this.appService.uploadVideo(
+      dto.videoId,
+      dto.creator as string,
+      dto.name,
+      dto.thumbnail,
+      dto.collection,
+      dto.playback_uri,
+      dto.tips
+    );
+  }
+
+  @Post('/watch-video/:address')
+  watchVideo(
+    @Param('address') address: string,
+    @Body() videoId: string
+  ): Promise<boolean> {
+    return this.appService.watchVideo(
+      address,
+      videoId,
+    );
+  }
+
   @Get('/streams')
   getStreams(
     @Query('page') page: number,
@@ -83,12 +110,32 @@ export class AppController {
     );
   }
 
-  @Get('/stream/:id')
+  @Get('/streams/:id')
   getStream(
     @Param('id') streamId: string,
   ): Promise<Stream | null> {
     return this.appService.getStream(
       streamId
+    );
+  }
+
+  @Get('/videos')
+  getVideos(
+    @Query('page') page: number,
+    @Query('creator') creator: string | null
+  ): Promise<Paged<Video[]> | null> {
+    return this.appService.getVideos(
+      page,
+      creator,
+    );
+  }
+
+  @Get('/videos/:id')
+  getVideo(
+    @Param('id') videoId: string,
+  ): Promise<Video | null> {
+    return this.appService.getVideo(
+      videoId
     );
   }
 

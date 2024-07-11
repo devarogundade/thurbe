@@ -1,0 +1,30 @@
+services:
+  thube-backend:
+    depends_on:
+      - redis
+    image: thube.azurecr.io/thube-backend:latest
+    container_name: thube-backend
+    restart: always
+    ports:
+      - "80:80"
+    env_file: .env
+    networks:
+      - thube-net
+  
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis-data:/data"
+    networks:
+      - thube-net
+
+volumes:
+  redis-data:
+
+networks:
+  thube-net:
+    driver: bridge

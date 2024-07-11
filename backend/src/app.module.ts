@@ -7,11 +7,13 @@ import { BullModule } from '@nestjs/bullmq';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { Stream } from 'stream';
+import { VideoSchema } from './database/schemas/video';
 import { StreamSchema } from './database/schemas/stream';
 import { Account, AccountSchema } from './database/schemas/account';
 import { MailWorker } from './worker/mail';
 // import { ScheduleModule } from '@nestjs/schedule';
 import { MainGateway } from './socket/main.gateway';
+import { Video } from './database/schemas/video';
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { MainGateway } from './socket/main.gateway';
     MongooseModule.forFeature([
       { name: Stream.name, schema: StreamSchema },
       { name: Account.name, schema: AccountSchema },
+      { name: Video.name, schema: VideoSchema },
     ])
   ],
   controllers: [AppController],
