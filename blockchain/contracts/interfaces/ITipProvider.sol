@@ -3,7 +3,7 @@ pragma solidity <=0.8.24;
 
 interface ITipProvider {
     function create(
-        address creator,
+        address streamer,
         uint256 minTip,
         uint256 maxTip,
         uint256 targetAmount
@@ -15,11 +15,11 @@ interface ITipProvider {
         uint256 amount
     ) external returns (uint256);
 
-    function pause(address creator, bytes32 tipId) external;
+    function pause(address streamer, bytes32 tipId) external;
 
-    function resume(address creator, bytes32 tipId) external;
+    function resume(address streamer, bytes32 tipId) external;
 
-    function end(address creator, bytes32 tipId) external;
+    function end(address streamer, bytes32 tipId) external;
 
-    function claim(address creator, bytes32 tipId) external returns (uint256);
+    function claim(address streamer, bytes32 tipId) external returns (uint256);
 }

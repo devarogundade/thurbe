@@ -124,10 +124,10 @@ export async function watchVideo(
 
 export async function getStreams(
     page: number,
-    creator: string | null
+    streamer: string | null
 ): Promise<Paged<Stream[]> | null> {
     try {
-        const response = await ThubeApi.get(`/streams?page=${page}&creator=${creator}`);
+        const response = await ThubeApi.get(`/streams?page=${page}&streamer=${streamer}`);
         return response.data;
     } catch (error) {
         console.error(error);
@@ -149,10 +149,10 @@ export async function getStream(
 
 export async function getVideos(
     page: number,
-    creator: string | null
+    streamer: string | null
 ): Promise<Paged<Video[]> | null> {
     try {
-        const response = await ThubeApi.get(`/videos?page=${page}&creator=${creator}`);
+        const response = await ThubeApi.get(`/videos?page=${page}&streamer=${streamer}`);
         return response.data;
     } catch (error) {
         console.error(error);

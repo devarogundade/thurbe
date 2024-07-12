@@ -3,19 +3,17 @@ pragma solidity <=0.8.24;
 
 library Data {
     struct Stream {
-        address creator;
+        address streamer;
         bytes32 tipId;
-        bytes32 drmId;
+        address cardId;
     }
 
-    struct DRM {
-        address creator;
-        address collectionId;
-        bool isExternal;
+    struct Streamer {
+        uint256 createdAt;
     }
 
     struct Tip {
-        address creator;
+        address streamer;
         uint256 minTip;
         uint256 maxTip;
         uint256 targetAmount;

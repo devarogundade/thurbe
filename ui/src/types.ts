@@ -54,7 +54,7 @@ export type Stream = {
     streamId: string;
     name: string;
     thumbnail: string;
-    creator: Account | string;
+    streamer: Account | string;
     playback_uri: string | null;
     player_uri: string | null;
     stream_server: string | null;
@@ -71,7 +71,7 @@ export type Video = {
     streamId: string;
     name: string;
     thumbnail: string;
-    creator: Account | string;
+    streamer: Account | string;
     playback_uri: string | null;
     player_uri: string | null;
     stream_server: string | null;

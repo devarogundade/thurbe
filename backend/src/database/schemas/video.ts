@@ -18,7 +18,7 @@ export class Video {
     thumbnail: string;
 
     @Prop({ required: true, type: Types.ObjectId, ref: Account.name })
-    creator: Account | string;
+    streamer: Account | string;
 
     @Prop({ default: null })
     playback_uri: string | null;

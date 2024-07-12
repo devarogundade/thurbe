@@ -13,13 +13,13 @@ contract TipProvider is Ownable, ITipProvider {
     constructor(address controller) Ownable(controller) {}
 
     function create(
-        address creator,
+        address streamer,
         uint256 minTip,
         uint256 maxTip,
         uint256 targetAmount
     ) external override onlyOwner returns (bytes32) {
         Data.Tip memory tip = Data.Tip({
-            creator: creator,
+            streamer: streamer,
             minTip: minTip,
             maxTip: maxTip,
             targetAmount: targetAmount,
@@ -38,11 +38,11 @@ contract TipProvider is Ownable, ITipProvider {
 
     function donate(
         bytes32 tipId,
-        address streamer,
+        address viewer,
         uint256 amount
     ) external override onlyOwner returns (uint256) {
         Data.Tip storage tip = _tips[tipId];
-        uint256 donated = _streamerDonors[tipId][streamer];
+        uint256 donated = _streamerDonors[tipId][viewer];
 
         require(
             (donated + amount) < tip.maxTip,
@@ -58,15 +58,18 @@ contract TipProvider is Ownable, ITipProvider {
         );
 
         tip.raisedAmount += amount;
-        _streamerDonors[tipId][streamer] += amount;
+        _streamerDonors[tipId][viewer] += amount;
 
         return tip.raisedAmount;
     }
 
-    function pause(address creator, bytes32 tipId) external override onlyOwner {
+    function pause(
+        address streamer,
+        bytes32 tipId
+    ) external override onlyOwner {
         Data.Tip storage tip = _tips[tipId];
 
-        require(creator == tip.creator, "Not owner");
+        require(streamer == tip.streamer, "Not owner");
         require(!tip.ended, "Data.Tip is ended");
         require(!tip.paused, "Data.Tip was already paused");
 
@@ -74,34 +77,34 @@ contract TipProvider is Ownable, ITipProvider {
     }
 
     function resume(
-        address creator,
+        address streamer,
         bytes32 tipId
     ) external override onlyOwner {
         Data.Tip storage tip = _tips[tipId];
 
-        require(creator == tip.creator, "Not owner");
+        require(streamer == tip.streamer, "Not owner");
         require(!tip.ended, "Data.Tip is ended");
         require(tip.paused, "Data.Tip was not paused");
 
         tip.paused = false;
     }
 
-    function end(address creator, bytes32 tipId) external override onlyOwner {
+    function end(address streamer, bytes32 tipId) external override onlyOwner {
         Data.Tip storage tip = _tips[tipId];
 
-        require(creator == tip.creator, "Not owner");
+        require(streamer == tip.streamer, "Not owner");
         require(!tip.ended, "Data.Tip was already ended");
 
         tip.ended = true;
     }
 
     function claim(
-        address creator,
+        address streamer,
         bytes32 tipId
     ) external override onlyOwner returns (uint256) {
         Data.Tip storage tip = _tips[tipId];
 
-        require(creator == tip.creator, "Not owner");
+        require(streamer == tip.streamer, "Not owner");
         require(tip.ended, "Data.Tip is not ended");
         require(!tip.claimed, "Data.Tip was already claimed");
 

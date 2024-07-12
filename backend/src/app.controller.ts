@@ -51,7 +51,7 @@ export class AppController {
   ): Promise<Stream | null> {
     return this.appService.startStream(
       dto.streamId,
-      dto.creator as string,
+      dto.streamer as string,
       dto.name,
       dto.thumbnail,
       dto.collection,
@@ -79,7 +79,7 @@ export class AppController {
   ): Promise<Video | null> {
     return this.appService.uploadVideo(
       dto.videoId,
-      dto.creator as string,
+      dto.streamer as string,
       dto.name,
       dto.thumbnail,
       dto.collection,
@@ -102,11 +102,11 @@ export class AppController {
   @Get('/streams')
   getStreams(
     @Query('page') page: number,
-    @Query('creator') creator: string | null
+    @Query('streamer') streamer: string | null
   ): Promise<Paged<Stream[]> | null> {
     return this.appService.getStreams(
       page,
-      creator,
+      streamer,
     );
   }
 
@@ -122,11 +122,11 @@ export class AppController {
   @Get('/videos')
   getVideos(
     @Query('page') page: number,
-    @Query('creator') creator: string | null
+    @Query('streamer') streamer: string | null
   ): Promise<Paged<Video[]> | null> {
     return this.appService.getVideos(
       page,
-      creator,
+      streamer,
     );
   }
 

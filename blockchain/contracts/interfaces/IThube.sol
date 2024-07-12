@@ -16,16 +16,15 @@ interface IThube {
     event StreamDonated(
         bytes32 streamId,
         uint256 raisedAmount,
-        address streamer,
+        address viewer,
         uint256 amount
     );
-    event StreamCreated(address creator, bytes32 drmId);
+    event StreamCreated(address streamer, address cardId);
+    event StreamerCreated(address streamer);
 
-    function startPublicStream() external returns (bytes32);
-    function startExternalPrivateStream(
-        address collectionId
-    ) external returns (bytes32);
-    function startPrivateStream() external returns (bytes32);
+    function createStreamer(string memory inclusiveCardBaseURI) external;
+    function startInclusiveStream() external returns (bytes32);
+    function startExclusiveStream() external returns (bytes32);
     function startTip(
         bytes32 streamId,
         uint256 minTip,

@@ -102,7 +102,7 @@ export class AppService {
         streamId,
         name,
         thumbnail,
-        creator: address,
+        streamer: address,
         playback_uri,
         player_uri,
         stream_server: '',
@@ -156,7 +156,7 @@ export class AppService {
         videoId,
         name,
         thumbnail,
-        creator: address,
+        streamer: address,
         playback_uri,
         tips,
         collection,
@@ -197,10 +197,10 @@ export class AppService {
 
   async getStreams(
     page: number,
-    creator?: string
+    streamer?: string
   ): Promise<Paged<Stream[]> | null> {
     try {
-      const filter = (creator != 'undefined') ? { creator } : {};
+      const filter = (streamer != 'undefined') ? { streamer } : {};
 
       const total = await this.streamModel.countDocuments(filter);
 
@@ -208,7 +208,7 @@ export class AppService {
         .limit(TAKE_SIZE * 1)
         .skip((page - 1) * TAKE_SIZE)
         .sort({ start_at: 'desc' })
-        .populate(['creator'])
+        .populate(['streamer'])
         .exec();
 
       const lastPage = Math.ceil(total / TAKE_SIZE);
@@ -225,7 +225,7 @@ export class AppService {
   ): Promise<Stream | null> {
     try {
       return this.streamModel.findOne({ streamId })
-        .populate(['creator'])
+        .populate(['streamer'])
         .exec();
     } catch (error) {
       console.error(error);
@@ -235,10 +235,10 @@ export class AppService {
 
   async getVideos(
     page: number,
-    creator?: string
+    streamer?: string
   ): Promise<Paged<Video[]> | null> {
     try {
-      const filter = (creator != 'undefined') ? { creator } : {};
+      const filter = (streamer != 'undefined') ? { streamer } : {};
 
       const total = await this.videoModel.countDocuments(filter);
 
@@ -246,7 +246,7 @@ export class AppService {
         .limit(TAKE_SIZE * 1)
         .skip((page - 1) * TAKE_SIZE)
         .sort({ start_at: 'desc' })
-        .populate(['creator'])
+        .populate(['streamer'])
         .exec();
 
       const lastPage = Math.ceil(total / TAKE_SIZE);
@@ -263,7 +263,7 @@ export class AppService {
   ): Promise<Video | null> {
     try {
       return this.videoModel.findOne({ videoId })
-        .populate(['creator'])
+        .populate(['streamer'])
         .exec();
     } catch (error) {
       console.error(error);

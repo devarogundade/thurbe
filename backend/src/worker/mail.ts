@@ -35,15 +35,15 @@ export class MailWorker extends WorkerHost {
         for (let index = 0; index < streams.length; index++) {
             const stream = streams[index];
 
-            const creator: Account = await this.accountModel.findOne({
-                address: stream.creator
+            const streamer: Account = await this.accountModel.findOne({
+                address: stream.streamer
             }).exec();
 
-            for (let index = 0; index < creator.followers.length; index++) {
+            for (let index = 0; index < streamer.followers.length; index++) {
                 this.sendMail(
-                    creator.followers[index].email,
+                    streamer.followers[index].email,
                     `Livestream notification.`,
-                    `${creator.name} is starting a live stream at ${stream.start_at}`
+                    `${streamer.name} is starting a live stream at ${stream.start_at}`
                 );
             }
         }
