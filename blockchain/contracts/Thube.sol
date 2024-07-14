@@ -57,22 +57,26 @@ contract Thube is IThube, AccessControl, Pausable {
     }
 
     // === Creator Functions ===
-    function startInclusiveStream() external whenNotPaused returns (bytes32) {
+    function startInclusiveStream(
+        bytes32 streamId
+    ) external whenNotPaused returns (bytes32) {
         address streamer = _msgSender();
 
         address cardId = _cardProvider.getInclusiveCard(streamer);
         require(cardId != address(0), "Inclusive card not created");
 
-        return _startStream(streamer, cardId);
+        return _startStream(streamId, streamer, cardId);
     }
 
-    function startExclusiveStream() external whenNotPaused returns (bytes32) {
+    function startExclusiveStream(
+        bytes32 streamId
+    ) external whenNotPaused returns (bytes32) {
         address streamer = _msgSender();
 
         address cardId = _cardProvider.getExclusiveCard(streamer);
         require(cardId != address(0), "Exclusive card not created");
 
-        return _startStream(streamer, cardId);
+        return _startStream(streamId, streamer, cardId);
     }
 
     // === Creator-Tip Functions ===
@@ -164,16 +168,19 @@ contract Thube is IThube, AccessControl, Pausable {
 
     // === Internal Functions ===
     function _startStream(
+        bytes32 streamId,
         address streamer,
         address cardId
     ) internal returns (bytes32) {
+        require(_streams[streamId].streamer == address(0));
+
         Data.Stream memory stream = Data.Stream({
             streamer: streamer,
             tipId: bytes32(0),
             cardId: cardId
         });
 
-        bytes32 streamId = Hash.streamId(stream);
+        _streams[streamId] = stream;
 
         emit StreamCreated(streamer, cardId);
 

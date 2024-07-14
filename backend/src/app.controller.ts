@@ -45,11 +45,11 @@ export class AppController {
     );
   }
 
-  @Post('/start-stream')
-  startStream(
+  @Post('/create-stream')
+  createStream(
     @Body() dto: Stream
   ): Promise<Stream | null> {
-    return this.appService.startStream(
+    return this.appService.createStream(
       dto.streamId,
       dto.streamer as string,
       dto.name,
@@ -59,6 +59,16 @@ export class AppController {
       dto.player_uri,
       dto.tips,
       dto.start_at,
+    );
+  }
+
+  @Post('/start-stream/:streamId')
+  startStream(
+    @Param('streamId') streamId: string,
+    @Body() txHash: string
+  ): Promise<boolean> {
+    return this.appService.startStream(
+      streamId, txHash
     );
   }
 

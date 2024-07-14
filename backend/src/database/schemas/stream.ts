@@ -32,6 +32,9 @@ export class Stream {
     @Prop({ default: null })
     stream_key: string | null;
 
+    @Prop({ default: null })
+    tx_hash: string | null;
+
     @Prop({ required: true })
     tips: boolean;
 

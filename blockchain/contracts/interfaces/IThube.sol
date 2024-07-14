@@ -23,8 +23,8 @@ interface IThube {
     event StreamerCreated(address streamer);
 
     function createStreamer(string memory inclusiveCardBaseURI) external;
-    function startInclusiveStream() external returns (bytes32);
-    function startExclusiveStream() external returns (bytes32);
+    function startInclusiveStream(bytes32 streamId) external returns (bytes32);
+    function startExclusiveStream(bytes32 streamId) external returns (bytes32);
     function startTip(
         bytes32 streamId,
         uint256 minTip,

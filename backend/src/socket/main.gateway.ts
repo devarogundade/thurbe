@@ -12,6 +12,7 @@ import {
 } from "@nestjs/websockets";
 
 import { Server } from "socket.io";
+import { startFFmpeg } from "src/ffmpeg";
 
 @WebSocketGateway()
 export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -47,6 +48,22 @@ export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // @ConnectedSocket() client: any,
   ): void {
     this.server.emit(`channel-${data.channelId}-tip`, data);
+  }
+
+  @SubscribeMessage('stream')
+  handleStream(
+    @MessageBody() data: any,
+    // @ConnectedSocket() client: any,
+  ): void {
+    startFFmpeg(data.url, data.signal);
+  }
+
+  @SubscribeMessage('stream-stop')
+  handleStreamStop(
+    @MessageBody() data: any,
+    // @ConnectedSocket() client: any,
+  ): void {
+    this.server.emit(`channel-${data.channelId}-stream-stop`, data);
   }
 
   @SubscribeMessage('selfie')

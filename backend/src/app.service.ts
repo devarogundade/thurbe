@@ -2,11 +2,13 @@
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { JobsOptions, Queue } from 'bullmq';
 import { Injectable } from '@nestjs/common';
 import { Account } from './database/schemas/account';
 import { Stream } from './database/schemas/stream';
 import { Paged } from './types';
 import { Video } from './database/schemas/video';
+import { InjectQueue } from '@nestjs/bullmq';
 
 const TAKE_SIZE: number = 25;
 
@@ -16,6 +18,7 @@ export class AppService {
     @InjectModel(Stream.name) private streamModel: Model<Stream>,
     @InjectModel(Account.name) private accountModel: Model<Account>,
     @InjectModel(Video.name) private videoModel: Model<Video>,
+    @InjectQueue('MailWorker') private queue: Queue
   ) {
   }
 
@@ -86,7 +89,7 @@ export class AppService {
     }
   }
 
-  async startStream(
+  async createStream(
     streamId: string,
     address: string,
     name: string,
@@ -107,6 +110,7 @@ export class AppService {
         player_uri,
         stream_server: '',
         stream_key: '',
+        tx_hash: null,
         tips,
         collection,
         created_at: new Date(),
@@ -115,10 +119,44 @@ export class AppService {
         mailSent: false
       };
 
+      const jobOptions: JobsOptions = {
+        removeOnComplete: true,
+        removeOnFail: true
+      };
+
+      this.queue.add(streamId, { streamId, started: false },
+        jobOptions
+      );
+
       return await this.streamModel.create(stream);
     } catch (error) {
       console.error(error);
       return null;
+    }
+  }
+
+  async startStream(
+    streamId: string,
+    tx_hash: string,
+  ): Promise<boolean> {
+    try {
+      await this.streamModel.updateOne({ streamId }, {
+        tx_hash
+      });
+
+      const jobOptions: JobsOptions = {
+        removeOnComplete: true,
+        removeOnFail: true
+      };
+
+      this.queue.add(streamId, { streamId, started: true },
+        jobOptions
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 

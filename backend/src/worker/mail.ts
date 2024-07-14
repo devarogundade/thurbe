@@ -13,7 +13,6 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 @Processor('MailWorker')
 export class MailWorker extends WorkerHost {
-
     constructor(
         @InjectModel(Stream.name) private streamModel: Model<Stream>,
         @InjectModel(Account.name) private accountModel: Model<Account>,
@@ -22,30 +21,36 @@ export class MailWorker extends WorkerHost {
     }
 
     async process(job: Job<any, any, string>): Promise<any> {
-        const date = new Date();
-        date.setTime(Date.now() - (5 * 60 * 1000));
+        const { streamId, started } = job.data;
 
-        const streams: Stream[] = await this.streamModel.find({
-            mailSent: false,
-            start_at: { $lte: date }
+        const stream: Stream = await this.streamModel.findOne({
+            streamId
         }).exec();
 
-        console.log('worker', streams);
+        const streamer: Account = await this.accountModel.findOne({
+            address: stream.streamer
+        }).populate(['followers']).exec();
 
-        for (let index = 0; index < streams.length; index++) {
-            const stream = streams[index];
+        const subject: string = 'Livestream notification.';
 
-            const streamer: Account = await this.accountModel.findOne({
-                address: stream.streamer
-            }).exec();
+        const message: string = started ?
+            `<p><b>${streamer.name}</b> is starting a live stream now.</p>
+            <br /> <br />
+            <p>${stream.name}</p>
+            <br /> <br />
+            <a href="https://thube.netlify.app/streams/${streamId}">Watch live</a>
+            ` :
+            `<p>${streamer.name} is starting a live stream at ${stream.start_at}</p>
+            <br /> <br />
+            <p>${stream.name}</p>
+            <br /> <br />
+            <a href="https://thube.netlify.app/streams/${streamId}">More detail</a>
+            `;
 
-            for (let index = 0; index < streamer.followers.length; index++) {
-                this.sendMail(
-                    streamer.followers[index].email,
-                    `Livestream notification.`,
-                    `${streamer.name} is starting a live stream at ${stream.start_at}`
-                );
-            }
+        for (let index = 0; index < streamer.followers.length; index++) {
+            this.sendMail(
+                streamer.followers[index].email, subject, message
+            );
         }
     }
 
