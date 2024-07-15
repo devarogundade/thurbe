@@ -6,6 +6,8 @@ library Data {
         address streamer;
         bytes32 tipId;
         address cardId;
+        bool ongoing;
+        bool ended;
     }
 
     struct Streamer {

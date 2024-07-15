@@ -89,6 +89,10 @@ contract TipProvider is Ownable, ITipProvider {
         tip.paused = false;
     }
 
+    function isEnded(bytes32 tipId) external override returns (bool) {
+        return _tips[tipId].ended;
+    }
+
     function end(address streamer, bytes32 tipId) external override onlyOwner {
         Data.Tip storage tip = _tips[tipId];
 

@@ -8,9 +8,27 @@ import Contract from '@/scripts/contract';
 import type { CreatedStream, StartedStream } from '@/types';
 import { notify } from '@/reactives/notify';
 
+let steam: MediaStream | null;
 const socketAPI = new SocketAPI(
     import.meta.env.VITE_BACKEND_URL
 );
+
+const endLivestream = async (streamId: `0x${string}`) => {
+    try {
+        // Interact with smart-contracts
+        const txHash: `0x${string}` | null = await Contract.endStream(streamId);
+        if (!txHash) { throw new Error(""); }
+
+        if (!steam) { throw new Error(""); }
+        await Media.closeStream(steam);
+
+        const data = JSON.stringify({ streamId });
+
+        socketAPI.emit('stream-stop', data);
+    } catch (error) {
+
+    }
+};
 
 const initLiveStream = async (streamId: `0x${string}`, description: string) => {
     try {
@@ -30,7 +48,7 @@ const initLiveStream = async (streamId: `0x${string}`, description: string) => {
         if (!startedStream) { throw new Error(""); }
 
         // Interact with device media
-        const steam: MediaStream | null = await Media.screenShare();
+        steam = await Media.screenShare();
         if (!steam) { throw new Error(""); }
 
         const peer = new Peer({ initiator: true, stream: steam, trickle: false });

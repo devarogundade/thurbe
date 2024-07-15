@@ -59,6 +59,24 @@ const Contract = {
         }
     },
 
+    async endStream(streamId: `0x${string}`): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thubeAbi,
+                address: thubeId,
+                functionName: 'endStream',
+                args: [streamId]
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
     async startTip(
         streamId: `0x${string}`,
         minTip: string,

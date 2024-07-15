@@ -19,6 +19,8 @@ interface ITipProvider {
 
     function resume(address streamer, bytes32 tipId) external;
 
+    function isEnded(bytes32 tipId) external returns (bool);
+
     function end(address streamer, bytes32 tipId) external;
 
     function claim(address streamer, bytes32 tipId) external returns (uint256);

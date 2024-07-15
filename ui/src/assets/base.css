@@ -4,10 +4,23 @@
   box-sizing: border-box;
   list-style: none;
   text-decoration: none;
-  font-family: "Kode Mono", monospace;
+  letter-spacing: 0.02em;
+  font-family: 'Axiforma';
+  transition: .2s;
+  scroll-behavior: smooth;
 }
 
 section {
   display: flex;
   justify-content: center;
+}
+
+.app_width {
+  width: 1400px;
+  max-width: calc(100% - 40px);
+}
+
+button:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 4px var(--tx-dimmed);
 }

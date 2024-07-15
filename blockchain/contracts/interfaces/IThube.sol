@@ -19,6 +19,7 @@ interface IThube {
         address viewer,
         uint256 amount
     );
+    event StreamTipEnded(bytes32 streamId, bytes32 tipId);
     event StreamCreated(address streamer, address cardId);
     event StreamerCreated(address streamer);
 

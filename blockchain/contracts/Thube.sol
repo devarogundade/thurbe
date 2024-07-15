@@ -79,6 +79,24 @@ contract Thube is IThube, AccessControl, Pausable {
         return _startStream(streamId, streamer, cardId);
     }
 
+    function endStream(bytes32 streamId) external whenNotPaused {
+        address streamer = _msgSender();
+
+        Data.Stream storage stream = _streams[streamId];
+        require(stream.streamer == streamer);
+        require(stream.ongoing, "Stream is not active.");
+        require(!stream.ended, "Stream has already ended.");
+
+        if (stream.tipId != bytes32(0) && !_tipProvider.isEnded(stream.tipId)) {
+            _tipProvider.end(streamer, stream.tipId);
+        }
+
+        stream.ongoing = false;
+        stream.ended = true;
+
+        emit StreamEnded(streamId);
+    }
+
     // === Creator-Tip Functions ===
     function startTip(
         bytes32 streamId,
@@ -132,7 +150,7 @@ contract Thube is IThube, AccessControl, Pausable {
 
         _tipProvider.end(streamer, stream.tipId);
 
-        emit StreamEnded(streamId);
+        emit StreamTipEnded(streamId, stream.tipId);
     }
 
     function claimTip(bytes32 streamId) external whenNotPaused {
@@ -177,7 +195,9 @@ contract Thube is IThube, AccessControl, Pausable {
         Data.Stream memory stream = Data.Stream({
             streamer: streamer,
             tipId: bytes32(0),
-            cardId: cardId
+            cardId: cardId,
+            ongoing: false,
+            ended: false
         });
 
         _streams[streamId] = stream;

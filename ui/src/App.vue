@@ -28,5 +28,3 @@ getAnalytics(app);
 <template>
   <RouterView />
 </template>
-
-<style scoped></style>
