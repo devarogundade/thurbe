@@ -6,6 +6,13 @@ import ExploreChannels from '@/views/explore/ExploreChannels.vue';
 import SignInView from '@/views/signin/SignInView.vue';
 import HomeView from '@/HomeView.vue';
 import AppView from '@/AppView.vue';
+import ChannelView from '@/views/channel/ChannelView.vue';
+import ChannelVideos from '@/views/channel/ChannelVideos.vue';
+import ChannelStreams from '@/views/channel/ChannelStreams.vue';
+import PortfolioView from '@/views/portfolio/PortfolioView.vue';
+import PortfolioVideos from '@/views/portfolio/PortfolioVideos.vue';
+import PortfolioStreams from '@/views/portfolio/PortfolioStreams.vue';
+import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,27 +28,67 @@ const router = createRouter({
       path: '/',
       name: 'explore',
       component: AppView,
-      children: [{
-        path: '/',
-        name: 'explore',
-        component: ExploreView,
-        children: [
-          {
-            path: '/',
-            name: 'explore-videos',
-            component: ExploreVideos
-          },
-          {
-            path: '/streams',
-            name: 'explore-streams',
-            component: ExploreStreams
-          },
-          {
-            path: '/channels',
-            name: 'explore-channels',
-            component: ExploreChannels
-          }]
-      }]
+      children: [
+        {
+          path: '/',
+          name: 'explore',
+          component: ExploreView,
+          children: [
+            {
+              path: '/',
+              name: 'explore-videos',
+              component: ExploreVideos
+            },
+            {
+              path: '/streams',
+              name: 'explore-streams',
+              component: ExploreStreams
+            },
+            {
+              path: '/channels',
+              name: 'explore-channels',
+              component: ExploreChannels
+            }]
+        },
+        {
+          path: '/portfolio',
+          name: 'portfolio',
+          component: PortfolioView,
+          children: [
+            {
+              path: '/portfolio',
+              name: 'portfolio-videos',
+              component: PortfolioVideos
+            },
+            {
+              path: '/portfolio/streams',
+              name: 'portfolio-streams',
+              component: PortfolioStreams
+            },
+            {
+              path: '/portfolio/revenue',
+              name: 'portfolio-revenue',
+              component: PortfolioRevenue
+            }]
+        },
+        {
+          path: '/channels/:id',
+          name: 'explore-channels-channel',
+          component: ChannelView,
+          children: [
+            {
+              path: '/channels/:id',
+              name: 'explore-channels-channel-videos',
+              component: ChannelVideos
+            },
+            {
+              path: '/channels/:id/streams',
+              name: 'explore-channels-channel-streams',
+              component: ChannelStreams
+            }
+          ]
+        }
+      ]
     },
     {
       path: '/signin',

@@ -1,6 +1,148 @@
 <script setup lang="ts">
 import AccountOption from './AccountOption.vue';
 import AccountOptionForm from './AccountOptionForm.vue';
+import { config, chains } from '@/scripts/config';
+import { useWalletStore } from '@/stores/wallet';
+import { createWeb3Modal } from '@web3modal/wagmi/vue';
+import { useWeb3Modal } from '@web3modal/wagmi/vue';
+import { watchAccount } from '@wagmi/core';
+import { WalletType, AccountType, type AccountForm } from '@/types';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import ThubeAPI from '@/scripts/thube-api';
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { notify } from '@/reactives/notify';
+
+createWeb3Modal({
+    wagmiConfig: config,
+    projectId: import.meta.env.VITE_PROJECT_ID,
+    // @ts-ignore
+    chains: chains,
+    enableAnalytics: true,
+    themeMode: 'light'
+});
+
+const modal = useWeb3Modal();
+const walletStore = useWalletStore();
+const router = useRouter();
+
+// progress
+const fetchingAccount = ref<boolean>(false);
+const accountCreateOptions = ref<boolean>(false);
+const accountCreateForm = ref<AccountForm | null>(null);
+
+const connectWallet = () => {
+    if (walletStore.address) {
+        fetchAccount(walletStore.address);
+        return;
+    }
+
+    if (walletStore.walletType == WalletType.WalletConnect) {
+        modal.open();
+    }
+
+    if (walletStore.walletType == WalletType.Metamask) {
+
+    }
+};
+
+const fetchAccount = async (address: string) => {
+    fetchingAccount.value = true;
+    const account = await ThubeAPI.getAccount(address);
+
+    walletStore.setAccount(account);
+
+    if (!account) {
+        accountCreateOptions.value = true;
+    } else {
+        router.push('/');
+    }
+
+    fetchingAccount.value = false;
+};
+
+const selectWalletType = (walletType: WalletType) => {
+    if (walletStore.walletType == walletType) return;
+
+    walletStore.setWalletType(walletType);
+    walletStore.setAddress(null);
+};
+
+const accountCreate = (accountType: AccountType) => {
+    if (accountType == AccountType.Google) {
+        googleAuthRequest();
+    }
+
+    if (accountType == AccountType.Manual) {
+        accountCreateForm.value = {
+            name: null,
+            email: null,
+            image: null
+        };
+    }
+};
+
+const accountCreation = async (form: AccountForm) => {
+    if (!walletStore.address) {
+        return;
+    }
+
+    if (!form.name) {
+        return;
+    }
+
+    if (!form.email) {
+        return;
+    }
+
+    const account = await ThubeAPI.createAccount(
+        walletStore.address,
+        form.name,
+        form.email,
+        form.image
+    );
+
+    walletStore.setAccount(account);
+
+    if (account) {
+        router.push('/');
+    } else {
+        notify.push({
+            title: 'Error: failed to create account.',
+            description: 'Please try again.',
+            category: 'error'
+        });
+    }
+};
+
+const googleAuthRequest = async () => {
+    const auth = getAuth();
+
+    const provider = new GoogleAuthProvider();
+
+    provider.addScope('profile');
+    provider.addScope('email');
+
+    try {
+        const result = await signInWithPopup(auth, provider);
+        accountCreateForm.value = {
+            name: result.user.displayName,
+            email: result.user.email,
+            image: result.user.photoURL
+        };
+    } catch (error) {
+
+    }
+};
+
+onMounted(() => {
+    watchAccount(config, {
+        onChange(account: any) {
+            walletStore.setAddress(account.address);
+            fetchAccount(account.address);
+        },
+    });
+});
 </script>
 
 <template>
@@ -13,16 +155,20 @@ import AccountOptionForm from './AccountOptionForm.vue';
                 </div>
 
                 <div class="signin_wallets">
-                    <div class="signin_wallet">
+                    <div :class="walletStore.walletType == WalletType.Metamask ? `signin_wallet signin_wallet_active` : `signin_wallet`"
+                        @click="() => { selectWalletType(WalletType.Metamask); }">
                         <div class="signin_wallet_name">
                             <img src="/images/metamask.png" alt="metamask">
                             <p>Metamask</p>
                         </div>
 
-                        <div class="signin_wallet_radio"></div>
+                        <div class="signin_wallet_radio">
+                            <div class="signin_wallet_radio_inner"></div>
+                        </div>
                     </div>
 
-                    <div class="signin_wallet signin_wallet_active">
+                    <div :class="walletStore.walletType == WalletType.WalletConnect ? `signin_wallet signin_wallet_active` : `signin_wallet`"
+                        @click="() => { selectWalletType(WalletType.WalletConnect); }">
                         <div class="signin_wallet_name">
                             <img src="/images/wallet_connect.png" alt="wallet_connect">
                             <p>WalletConnect</p>
@@ -33,24 +179,31 @@ import AccountOptionForm from './AccountOptionForm.vue';
                         </div>
                     </div>
 
-                    <div class="signin_wallet">
+                    <div :class="walletStore.walletType == WalletType.ThetaWallet ? `signin_wallet signin_wallet_active` : `signin_wallet`"
+                        @click="() => { selectWalletType(WalletType.ThetaWallet); }">
                         <div class="signin_wallet_name">
                             <img src="/images/theta_wallet.png" alt="theta_wallet">
                             <p>Theta Wallet</p>
                         </div>
 
-                        <div class="signin_wallet_radio"></div>
+                        <div class="signin_wallet_radio">
+                            <div class="signin_wallet_radio_inner"></div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="signin_action">
-                    <button>Connect Wallet</button>
+                    <button @click="connectWallet">Connect Wallet</button>
                 </div>
             </div>
         </div>
 
-        <!-- <AccountOption /> -->
-        <!-- <AccountOptionForm /> -->
+        <AccountOption
+            v-if="!walletStore.account && !fetchingAccount && walletStore.address && accountCreateOptions && !accountCreateForm"
+            @close="accountCreateOptions = false" @continue="accountCreate" />
+
+        <AccountOptionForm :form="accountCreateForm" v-if="accountCreateForm" @close="accountCreateForm = null"
+            @continue="accountCreation" />
     </section>
 </template>
 

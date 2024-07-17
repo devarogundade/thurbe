@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import ThubeLogo from '@/components/icons/ThubeLogo.vue';
 import WalletIcon from '@/components/icons/WalletIcon.vue';
+import OutIcon from '@/components/icons/OutIcon.vue';
+
+
+
 </script>
 
 <template>
@@ -8,15 +12,19 @@ import WalletIcon from '@/components/icons/WalletIcon.vue';
         <div class="app_width">
             <header>
                 <div class="logo">
-                    <RouterLink to="/signin">
+                    <RouterLink to="/">
                         <ThubeLogo />
                     </RouterLink>
                 </div>
 
                 <div class="tabs">
-                    <RouterLink to="/signin">Home</RouterLink>
-                    <a href="/" target="_blank">Docs</a>
-                    <a href="/" target="_blank">Blog</a>
+                    <RouterLink to="/">Home</RouterLink>
+                    <a href="/" target="_blank">Docs
+                        <OutIcon />
+                    </a>
+                    <a href="/" target="_blank">Blog
+                        <OutIcon />
+                    </a>
                 </div>
 
                 <div class="connect">
@@ -61,6 +69,9 @@ header {
     color: var(--tx-dimmed);
     font-size: 14px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .tabs a:hover {
@@ -79,6 +90,11 @@ header {
     gap: 12px;
     user-select: none;
     cursor: pointer;
+}
+
+.connect {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .connect button p {

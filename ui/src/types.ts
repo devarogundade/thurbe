@@ -1,3 +1,20 @@
+export enum WalletType {
+    Metamask,
+    WalletConnect,
+    ThetaWallet
+}
+
+export enum AccountType {
+    Google,
+    Manual
+}
+
+export type AccountForm = {
+    name: string | null,
+    email: string | null,
+    image: string | null;
+};
+
 export type Token = {
     tokenId: `0x${string}`;
     name: string;

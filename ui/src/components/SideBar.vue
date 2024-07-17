@@ -52,31 +52,31 @@ const route = useRoute();
                     </div>
                 </div>
                 <div class="tab_parent">
-                    <RouterLink to="/channel">
+                    <RouterLink to="/portfolio">
                         <div class="title">
-                            <AirdropIcon :active="(route.name as string)?.startsWith('channel')" />
+                            <AirdropIcon :active="(route.name as string)?.startsWith('portfolio')" />
                             <h3>My Channel</h3>
                             <div
-                                :class="(route.name as string)?.startsWith('channel') ? 'indicator indicator_active' : 'indicator'">
+                                :class="(route.name as string)?.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'">
                             </div>
                         </div>
                     </RouterLink>
                     <div class="tabs">
-                        <RouterLink to="/channel">
+                        <RouterLink to="/portfolio">
                             <div
-                                :class="(route.name as string)?.startsWith('channel-videos') ? 'tab tab_active' : 'tab'">
+                                :class="(route.name as string)?.startsWith('portfolio-videos') ? 'tab tab_active' : 'tab'">
                                 Videos
                             </div>
                         </RouterLink>
-                        <RouterLink to="/channel/streams">
+                        <RouterLink to="/portfolio/streams">
                             <div
-                                :class="(route.name as string)?.startsWith('channel-streams') ? 'tab tab_active' : 'tab'">
+                                :class="(route.name as string)?.startsWith('portfolio-streams') ? 'tab tab_active' : 'tab'">
                                 Streams
                             </div>
                         </RouterLink>
-                        <RouterLink to="/channel/revenue">
+                        <RouterLink to="/portfolio/revenue">
                             <div
-                                :class="(route.name as string)?.startsWith('channel-revenue') ? 'tab tab_active' : 'tab'">
+                                :class="(route.name as string)?.startsWith('portfolio-revenue') ? 'tab tab_active' : 'tab'">
                                 Revenue
                             </div>
                         </RouterLink>

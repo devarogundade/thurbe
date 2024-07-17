@@ -6,7 +6,7 @@ const Converter = {
         return emailRegex.test(email);
     },
 
-    fineHash: function (hash: string | null, space: number) {
+    fineAddress: function (hash: string | null, space: number) {
         if (hash == null || hash.length == 0) return '- - - - -';
         return hash.substring(0, space) + '...' + hash.substring(hash.length - space, hash.length);
     },

@@ -1,11 +1,30 @@
 <script setup lang="ts">
 import CloseIcon from '@/components/icons/CloseIcon.vue';
+import { AccountType } from '@/types';
+import { useWalletStore } from '@/stores/wallet';
+
+const emit = defineEmits(['close', 'continue']);
+const walletStore = useWalletStore();
+
+const selectAccountType = (accountType: AccountType) => {
+    walletStore.setAccountType(accountType);
+};
+
+const fillForm = () => {
+    if (walletStore.accountType == AccountType.Google) {
+        emit('continue', AccountType.Google);
+    }
+
+    if (walletStore.accountType == AccountType.Manual) {
+        emit('continue', AccountType.Manual);
+    }
+};
 </script>
 
 <template>
     <div class="blur">
         <div class="container">
-            <div class="close">
+            <div class="close" @click="emit('close')">
                 <CloseIcon />
             </div>
 
@@ -15,7 +34,8 @@ import CloseIcon from '@/components/icons/CloseIcon.vue';
             </div>
 
             <div class="signin_account_options">
-                <div class="signin_account_option signin_account_option_active">
+                <div :class="walletStore.accountType == AccountType.Google ? `signin_account_option signin_account_option_active` : `signin_account_option`"
+                    @click="() => { selectAccountType(AccountType.Google); }">
                     <div class="signin_account_option_name">
                         <img src="/images/google.png" alt="metamask">
                         <p>Use Google Account</p>
@@ -26,7 +46,8 @@ import CloseIcon from '@/components/icons/CloseIcon.vue';
                     </div>
                 </div>
 
-                <div class="signin_account_option">
+                <div :class="walletStore.accountType == AccountType.Manual ? `signin_account_option signin_account_option_active` : `signin_account_option`"
+                    @click="() => { selectAccountType(AccountType.Manual); }">
                     <div class="signin_account_option_name">
                         <img src="/images/form.png" alt="wallet_connect">
                         <p>Continue Manually</p>
@@ -39,7 +60,7 @@ import CloseIcon from '@/components/icons/CloseIcon.vue';
             </div>
 
             <div class="signin_action">
-                <button>Continue</button>
+                <button @click="fillForm">Continue</button>
             </div>
         </div>
     </div>

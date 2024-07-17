@@ -2,12 +2,59 @@
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import ImportIcon from '@/components/icons/ImportIcon.vue';
 import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
+import { type AccountForm } from '@/types';
+import Storage from '@/scripts/storage';
+import { useWalletStore } from '@/stores/wallet';
+import { ref } from 'vue';
+
+let file: File | null = null;
+const emit = defineEmits(['close', 'continue']);
+const walletStore = useWalletStore();
+
+const props = defineProps({
+    form: { type: Object, required: true }
+});
+
+const selectImage = (event: any) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+        form.value.image = URL.createObjectURL(files[0]);
+        file = files[0];
+    }
+    else {
+        file = null;
+    }
+};
+
+const form = ref<AccountForm>({
+    name: props.form.name,
+    email: props.form.email,
+    image: props.form.image
+});
+
+const createAccount = () => {
+    if (file && walletStore.address) {
+        Storage.upload(
+            file,
+            walletStore.address,
+            (photoURL: string) => {
+                form.value.image = photoURL;
+                emit('continue', form);
+            },
+            () => {
+                form.value.image = null;
+                emit('continue', form);
+            });
+    } else {
+        emit('continue', form);
+    }
+};
 </script>
 
 <template>
     <div class="blur">
         <div class="container">
-            <div class="close">
+            <div class="close" @click="emit('close')">
                 <div class="back">
                     <ArrowRightIcon />
                     <p>Back</p>
@@ -20,10 +67,11 @@ import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
 
                 <div class="signin_profile_image">
                     <div class="signin_profile_image_bg">
-                        <img src="/images/image_default.png" alt="image_default">
+                        <img :src="form.image || '/images/image_default.png'" alt="image_default">
                     </div>
 
                     <div class="signin_profile_image_content">
+                        <input type="file" @change="selectImage">
                         <div class="signin_profile_image_text">
                             <ImportIcon />
                             <p><span>Click to upload</span> JPG or PNG 100 x 100px recommended</p>
@@ -34,16 +82,16 @@ import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
 
             <div class="signin_input">
                 <div class="label">Username <span>*</span></div>
-                <input type="text" placeholder="e.g John Doe" />
+                <input type="text" placeholder="e.g John Doe" v-model="form.name" />
             </div>
 
             <div class="signin_input">
                 <div class="label">Email Address</div>
-                <input type="text" placeholder="e.g JohnDoe@gmail.com" />
+                <input type="text" placeholder="e.g JohnDoe@gmail.com" v-model="form.email" />
             </div>
 
             <div class="signin_action">
-                <button>Confirm</button>
+                <button @click="createAccount">Confirm</button>
             </div>
         </div>
     </div>
@@ -156,14 +204,23 @@ import ArrowRightIcon from '@/components/icons/ArrowRightIcon.vue';
 }
 
 .signin_profile_image_bg img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
 }
 
 .signin_profile_image_content {
     display: flex;
     justify-content: center;
+    position: relative;
+}
+
+.signin_profile_image_content input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
 }
 
 .signin_profile_image_text {

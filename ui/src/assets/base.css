@@ -21,6 +21,7 @@ section {
 }
 
 button:hover {
-  transform: translateY(-4px);
-  box-shadow: 4px 4px var(--tx-dimmed);
+  transform: translateX(-3px);
+  transform: translateY(-3px);
+  box-shadow: 3px 3px var(--tx-dimmed);
 }

@@ -5,9 +5,9 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
 </script>
 
 <template>
-    <div class="videos">
-        <RouterLink v-for="num, index in 14" :key="index" :to="`/explore/videos/${num}`">
-            <div class="video">
+    <div class="channels">
+        <RouterLink v-for="num, index in 14" :key="index" :to="`/channels/${num}`">
+            <div class="channel">
                 <div class="thumbnail">
                     <img src="/images/game.png" alt="">
                     <div class="play_button"></div>
@@ -43,7 +43,7 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
 </template>
 
 <style scoped>
-.videos {
+.channels {
     padding: 40px 20px;
     display: flex;
     column-gap: 50px;
@@ -53,20 +53,21 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
     flex-wrap: wrap;
 }
 
-.video {
-    width: 480px;
+.channel {
+    width: 482px;
+    max-width: 100%;
     border-radius: 8px;
     overflow: hidden;
     background: var(--bg-dark);
 }
 
-.video .thumbnail {
+.channel .thumbnail {
     height: 120px;
     position: relative;
     width: 100%;
 }
 
-.video .thumbnail img {
+.channel .thumbnail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -127,6 +128,7 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 6px;
     gap: 10px;
     border: none;
     cursor: pointer;

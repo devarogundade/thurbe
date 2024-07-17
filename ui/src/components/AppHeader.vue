@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import ThubeLogo from '@/components/icons/ThubeLogo.vue';
 import WalletIcon from '@/components/icons/WalletIcon.vue';
+import { useWalletStore } from '@/stores/wallet';
+import Converter from '@/scripts/converter';
+
+const walletStore = useWalletStore();
 </script>
 
 <template>
@@ -16,9 +19,16 @@ import WalletIcon from '@/components/icons/WalletIcon.vue';
                 </div>
 
                 <div class="connect">
-                    <button>
+                    <RouterLink to="/signin" v-if="!walletStore.account">
+                        <button>
+                            <WalletIcon />
+                            <p>Connect Wallet</p>
+                        </button>
+                    </RouterLink>
+
+                    <button v-if="walletStore.account">
                         <WalletIcon />
-                        <p>Connect Wallet</p>
+                        <p>{{ Converter.fineAddress(walletStore.address, 5) }}</p>
                     </button>
                 </div>
             </header>
@@ -40,6 +50,7 @@ header {
     grid-template-columns: 200px auto 200px;
     align-items: center;
     background: var(--bg);
+    padding-right: 45px;
 }
 
 .tabs {
@@ -57,6 +68,11 @@ header {
 
 .tabs a:hover {
     color: var(--tx-normal);
+}
+
+.connect {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .connect button {
