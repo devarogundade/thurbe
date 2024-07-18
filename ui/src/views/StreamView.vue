@@ -3,7 +3,7 @@ import Peer from 'simple-peer';
 import Media from '@/scripts/media';
 import ThetaAPI from '@/scripts/theta-api';
 import SocketAPI from '@/scripts/socket-api';
-import ThubeAPI from '@/scripts/thube-api';
+import ThurbeAPI from '@/scripts/thurbe-api';
 import Contract from '@/scripts/contract';
 import type { CreatedStream, StartedStream } from '@/types';
 import { notify } from '@/reactives/notify';
@@ -72,7 +72,7 @@ const initLiveStream = async (streamId: `0x${string}`, description: string) => {
                 category: 'success'
             });
 
-            ThubeAPI.startStream(streamId, txHash);
+            ThurbeAPI.startStream(streamId, txHash);
         });
 
         peer.on('error', (error: any) => {

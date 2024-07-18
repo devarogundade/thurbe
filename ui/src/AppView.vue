@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router';
 import AppHeader from '@/components/AppHeader.vue';
 import SideBar from '@/components/SideBar.vue';
-import ThubeAPI from '@/scripts/thube-api';
+import ThurbeAPI from '@/scripts/thurbe-api';
 import { onMounted, ref } from 'vue';
 import { useWalletStore } from '@/stores/wallet';
 import { WalletType } from '@/types';
@@ -14,7 +14,7 @@ const fetchingAccount = ref<boolean>(false);
 
 const fetchAccount = async (address: string, walletType: WalletType) => {
     fetchingAccount.value = true;
-    const account = await ThubeAPI.getAccount(address);
+    const account = await ThurbeAPI.getAccount(address);
 
     walletStore.setAddress(address);
     walletStore.setAccount(account);

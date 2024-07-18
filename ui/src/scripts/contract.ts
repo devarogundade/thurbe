@@ -1,5 +1,5 @@
 import { config } from './config';
-import { abi as thubeAbi } from '../abis/thube';
+import { abi as thubeAbi } from '../abis/thurbe';
 import { waitForTransactionReceipt, writeContract } from '@wagmi/core';
 
 export const thubeId: `0x${string}` = '0x';

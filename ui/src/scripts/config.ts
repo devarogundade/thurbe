@@ -3,9 +3,9 @@ import { defaultWagmiConfig } from '@web3modal/wagmi';
 import { thetaTestnet } from './theta';
 
 const metadata = {
-    name: 'Thube',
-    description: 'Thube',
-    url: 'https://thube.xyz',
+    name: 'Thurbe',
+    description: 'Thurbe',
+    url: 'https://thurbe.xyz',
     icons: ['https://avatars.githubusercontent.com/u/37784886']
 };
 

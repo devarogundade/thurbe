@@ -42,7 +42,7 @@ export class MailWorker extends WorkerHost {
             <br /> <br />
             <p style="font-size: 18px;">Title: ${stream.name}</p>
             <br /> <br />
-            <a href="https://thube.xyz/streams/${streamId}">
+            <a href="https://thurbe.xyz/streams/${streamId}">
                 <button style="width: 100%; height: 40px; color: #FFF; background: rgba(24, 48, 40, 1); border: none;">
                     Watch live
                 </button>
@@ -52,7 +52,7 @@ export class MailWorker extends WorkerHost {
             <br /> <br />
             <p style="font-size: 18px;">Title: ${stream.name}</p>
             <br /> <br />
-            <a href="https://thube.xyz/streams/${streamId}">
+            <a href="https://thurbe.xyz/streams/${streamId}">
                 <button style="width: 100%; height: 40px; color: #FFF; background: rgba(24, 48, 40, 1); border: none;">
                     More detail
                 </button>

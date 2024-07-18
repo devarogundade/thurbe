@@ -10,7 +10,7 @@ import Metamask from '@/scripts/metamask';
 import { WalletType, AccountType, type AccountForm } from '@/types';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import ThubeAPI from '@/scripts/thube-api';
+import ThurbeAPI from '@/scripts/thurbe-api';
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { notify } from '@/reactives/notify';
 
@@ -54,7 +54,7 @@ const connectWallet = () => {
 
 const fetchAccount = async (address: string) => {
     fetchingAccount.value = true;
-    const account = await ThubeAPI.getAccount(address);
+    const account = await ThurbeAPI.getAccount(address);
     walletStore.setAccount(account);
 
     if (!account) {
@@ -103,7 +103,7 @@ const accountCreation = async (form: AccountForm) => {
         return;
     }
 
-    const account = await ThubeAPI.createAccount(
+    const account = await ThurbeAPI.createAccount(
         walletStore.address,
         form.name,
         form.email,

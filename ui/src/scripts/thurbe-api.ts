@@ -5,7 +5,7 @@ const client = axios.create({
     baseURL: 'http://localhost:8080'
 });
 
-const ThubeAPI = {
+const ThurbeAPI = {
     async createAccount(
         address: string,
         name: string,
@@ -237,4 +237,4 @@ const ThubeAPI = {
     }
 };
 
-export default ThubeAPI;
+export default ThurbeAPI;

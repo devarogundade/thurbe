@@ -11,7 +11,7 @@ import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Thube is IThube, AccessControl, Pausable {
+contract Thurbe is IThube, AccessControl, Pausable {
     CardProvider private _cardProvider;
     TipProvider private _tipProvider;
 
