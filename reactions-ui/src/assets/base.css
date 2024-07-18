@@ -10,22 +10,14 @@
   scroll-behavior: smooth;
 }
 
-body {
-  width: 420px;
-  height: 540px;
-  background: transparent;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
 section {
   display: flex;
   justify-content: center;
 }
 
 .app_width {
-  width: 400px;
-  max-width: calc(100% - 30px);
+  width: 1400px;
+  max-width: calc(100% - 60px);
 }
 
 button:hover {
