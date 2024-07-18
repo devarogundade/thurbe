@@ -9,8 +9,9 @@ import { Stream } from './database/schemas/stream';
 import { Paged } from './types';
 import { Video } from './database/schemas/video';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Channel } from './database/schemas/channel';
 
-const TAKE_SIZE: number = 25;
+const TAKE_SIZE: number = 14;
 
 @Injectable()
 export class AppService {
@@ -18,6 +19,7 @@ export class AppService {
     @InjectModel(Stream.name) private streamModel: Model<Stream>,
     @InjectModel(Account.name) private accountModel: Model<Account>,
     @InjectModel(Video.name) private videoModel: Model<Video>,
+    @InjectModel(Channel.name) private channelModel: Model<Channel>,
     @InjectQueue('MailWorker') private queue: Queue
   ) {
   }
@@ -25,24 +27,51 @@ export class AppService {
   async createAccount(
     address: string,
     name: string,
-    email: string,
+    email: string | null,
     image: string | null
   ): Promise<Account | null> {
     try {
+      const exists = await this.accountModel.exists({ address });
+      if (exists) return null;
+
       const account: Account = {
         address,
         name,
         email,
         image,
         created_at: new Date(),
-        followers: []
+        followers: [],
+        channel: null,
+        videos: [],
+        streams: []
       };
 
-      await this.accountModel.updateOne(
-        { address }, account, { upsert: true }
-      );
+      return this.accountModel.create(account);
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
 
-      return account;
+  async createChannel(
+    owner: string,
+    name: string,
+    image: string,
+    cover: string | null
+  ): Promise<Channel | null> {
+    try {
+      const exists = await this.channelModel.exists({ owner });
+      if (exists) return null;
+
+      const channel: Channel = {
+        owner,
+        name,
+        image,
+        cover,
+        created_at: new Date()
+      };
+
+      return this.channelModel.create(channel);
     } catch (error) {
       console.error(error);
       return null;
@@ -94,13 +123,16 @@ export class AppService {
     address: string,
     name: string,
     thumbnail: string,
-    collection: string,
+    exclusive: boolean,
     playback_uri: string | null,
     player_uri: string | null,
     tips: boolean,
     start_at: Date
   ): Promise<Stream | null> {
     try {
+      const exists = await this.streamModel.exists({ streamId });
+      if (exists) return null;
+
       const stream: Stream = {
         streamId,
         name,
@@ -112,7 +144,7 @@ export class AppService {
         stream_key: '',
         tx_hash: null,
         tips,
-        collection,
+        exclusive,
         created_at: new Date(),
         start_at,
         viewers: [],
@@ -126,6 +158,15 @@ export class AppService {
 
       this.queue.add(streamId, { streamId, started: false },
         jobOptions
+      );
+
+      await this.accountModel.updateOne(
+        { address },
+        {
+          $addToSet: {
+            streams: streamId
+          },
+        }
       );
 
       return await this.streamModel.create(stream);
@@ -185,11 +226,14 @@ export class AppService {
     address: string,
     name: string,
     thumbnail: string,
-    collection: string,
+    exclusive: boolean,
     playback_uri: string | null,
     tips: boolean,
   ): Promise<Video | null> {
     try {
+      const exists = await this.videoModel.exists({ videoId });
+      if (exists) return null;
+
       const video: Video = {
         videoId,
         name,
@@ -197,11 +241,20 @@ export class AppService {
         streamer: address,
         playback_uri,
         tips,
-        collection,
+        exclusive,
         created_at: new Date(),
         viewers: [],
         views: 0
       };
+
+      await this.accountModel.updateOne(
+        { address },
+        {
+          $addToSet: {
+            videos: videoId
+          },
+        }
+      );
 
       return await this.videoModel.create(video);
     } catch (error) {
@@ -314,7 +367,41 @@ export class AppService {
   ): Promise<Account | null> {
     try {
       return this.accountModel.findOne({ address })
-        .populate(['followers'])
+        .exec();
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async getChannels(
+    page: number,
+  ): Promise<Paged<Channel[]> | null> {
+    try {
+      const total = await this.channelModel.countDocuments();
+
+      const data = await this.channelModel.find()
+        .limit(TAKE_SIZE * 1)
+        .skip((page - 1) * TAKE_SIZE)
+        .sort({ start_at: 'desc' })
+        .populate(['owner'])
+        .exec();
+
+      const lastPage = Math.ceil(total / TAKE_SIZE);
+
+      return { total, lastPage, data };
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  async getChannel(
+    address: string
+  ): Promise<Channel | null> {
+    try {
+      return this.channelModel.findOne({ address })
+        .populate(['owner'])
         .exec();
     } catch (error) {
       console.error(error);

@@ -64,6 +64,17 @@ export type Account = {
     image: string | null;
     email: string;
     followers: Account[];
+    channel: Channel | null;
+    videos: Video[];
+    streams: Stream[];
+    created_at: Date;
+};
+
+export type Channel = {
+    owner: Account;
+    name: string;
+    image: string;
+    cover: string | null;
     created_at: Date;
 };
 
@@ -76,29 +87,25 @@ export type Stream = {
     player_uri: string | null;
     stream_server: string | null;
     stream_key: string | null;
+    tx_hash: string | null;
     tips: boolean;
     viewers: Account[];
-    collection: string | null;
+    exclusive: boolean;
     created_at: Date;
     start_at: Date;
-    mailSent: boolean;
 };
 
 export type Video = {
-    streamId: string;
+    videoId: string;
     name: string;
     thumbnail: string;
     streamer: Account | string;
     playback_uri: string | null;
-    player_uri: string | null;
-    stream_server: string | null;
-    stream_key: string | null;
     tips: boolean;
     viewers: Account[];
-    collection: string | null;
+    views: number;
+    exclusive: boolean;
     created_at: Date;
-    start_at: Date;
-    mailSent: boolean;
 };
 
 export type Paged<T> = {

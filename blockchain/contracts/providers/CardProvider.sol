@@ -1,30 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity <=0.8.24;
 
+import {ICard} from "../interfaces/ICard.sol";
 import {Data} from "../libraries/Data.sol";
 import {Hash} from "../libraries/Hash.sol";
 import {ICardProvider} from "../interfaces/ICardProvider.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {InclusiveCard} from "../cards/InclusiveCard.sol";
+import {Card} from "../cards/Card.sol";
 import {ExclusiveCard} from "../cards/ExclusiveCard.sol";
 
 contract CardProvider is Ownable, ICardProvider {
-    mapping(address => address) private _inclusiveCards;
+    mapping(address => address) private _cards;
     mapping(address => address) private _exclusiveCards;
 
     constructor(address controller) Ownable(controller) {}
 
-    function createInclusiveCard(
+    function createCard(
         address streamer,
         string memory baseURI
     ) external override onlyOwner returns (address) {
-        require(_inclusiveCards[streamer] == address(0));
+        require(_cards[streamer] == address(0));
 
-        InclusiveCard card = new InclusiveCard(address(this), baseURI);
+        Card card = new Card(address(this), baseURI);
 
         address cardId = address(card);
-        _inclusiveCards[streamer] = cardId;
+        _cards[streamer] = cardId;
 
         return cardId;
     }
@@ -52,15 +53,19 @@ contract CardProvider is Ownable, ICardProvider {
         return cardId;
     }
 
-    function getInclusiveCard(
+    function getCard(
         address streamer
     ) external view override returns (address) {
-        return _inclusiveCards[streamer];
+        return _cards[streamer];
     }
 
     function getExclusiveCard(
         address streamer
     ) external view override returns (address) {
         return _exclusiveCards[streamer];
+    }
+
+    function mintCard(address cardId, address to) external onlyOwner {
+        ICard(cardId).mint(to);
     }
 }

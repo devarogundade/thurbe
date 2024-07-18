@@ -29,28 +29,39 @@ export class MailWorker extends WorkerHost {
 
         const streamer: Account = await this.accountModel.findOne({
             address: stream.streamer
-        }).populate(['followers']).exec();
+        }).populate(['followers', 'channel']).exec();
 
-        const subject: string = 'Livestream notification.';
+        if (streamer.followers.length == 0 || !streamer.channel) {
+            return;
+        }
+
+        const subject: string = `${streamer.name} from Thurbe.`;
 
         const message: string = started ?
-            `<p><b>${streamer.name}</b> is starting a live stream now.</p>
+            `<p><b>${streamer.channel.name}</b> is starting a live stream now.</p>
             <br /> <br />
-            <p>${stream.name}</p>
+            <p style="font-size: 18px;">Title: ${stream.name}</p>
             <br /> <br />
-            <a href="https://thube.netlify.app/streams/${streamId}">Watch live</a>
+            <a href="https://thube.xyz/streams/${streamId}">
+                <button style="width: 100%; height: 40px; color: #FFF; background: rgba(24, 48, 40, 1); border: none;">
+                    Watch live
+                </button>
+            </a>
             ` :
-            `<p>${streamer.name} is starting a live stream at ${stream.start_at}</p>
+            `<p>${streamer.channel.name} is starting a live stream at ${stream.start_at}</p>
             <br /> <br />
-            <p>${stream.name}</p>
+            <p style="font-size: 18px;">Title: ${stream.name}</p>
             <br /> <br />
-            <a href="https://thube.netlify.app/streams/${streamId}">More detail</a>
+            <a href="https://thube.xyz/streams/${streamId}">
+                <button style="width: 100%; height: 40px; color: #FFF; background: rgba(24, 48, 40, 1); border: none;">
+                    More detail
+                </button>
+            </a>
             `;
 
         for (let index = 0; index < streamer.followers.length; index++) {
-            this.sendMail(
-                streamer.followers[index].email, subject, message
-            );
+            const viewerEmail = streamer.followers[index].email;
+            if (viewerEmail) this.sendMail(viewerEmail, subject, message);
         }
     }
 

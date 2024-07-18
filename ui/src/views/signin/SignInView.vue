@@ -6,6 +6,7 @@ import { useWalletStore } from '@/stores/wallet';
 import { createWeb3Modal } from '@web3modal/wagmi/vue';
 import { useWeb3Modal } from '@web3modal/wagmi/vue';
 import { watchAccount } from '@wagmi/core';
+import Metamask from '@/scripts/metamask';
 import { WalletType, AccountType, type AccountForm } from '@/types';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -32,6 +33,8 @@ const accountCreateOptions = ref<boolean>(false);
 const accountCreateForm = ref<AccountForm | null>(null);
 
 const connectWallet = () => {
+    localStorage.setItem('wallet-type', walletStore.walletType.toString());
+
     if (walletStore.address) {
         fetchAccount(walletStore.address);
         return;
@@ -42,19 +45,22 @@ const connectWallet = () => {
     }
 
     if (walletStore.walletType == WalletType.Metamask) {
-
+        Metamask.open((address) => {
+            walletStore.setAddress(address);
+            fetchAccount(address);
+        });
     }
 };
 
 const fetchAccount = async (address: string) => {
     fetchingAccount.value = true;
     const account = await ThubeAPI.getAccount(address);
-
     walletStore.setAccount(account);
 
     if (!account) {
         accountCreateOptions.value = true;
     } else {
+        localStorage.setItem('address', address || 'null');
         router.push('/');
     }
 
@@ -66,6 +72,8 @@ const selectWalletType = (walletType: WalletType) => {
 
     walletStore.setWalletType(walletType);
     walletStore.setAddress(null);
+
+    localStorage.setItem('wallet-type', walletType.toString());
 };
 
 const accountCreate = (accountType: AccountType) => {

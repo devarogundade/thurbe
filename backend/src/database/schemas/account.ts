@@ -2,6 +2,9 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Channel } from './channel';
+import { Stream } from './stream';
+import { Video } from './video';
 
 export type AccountDocument = HydratedDocument<Account>;
 
@@ -14,13 +17,22 @@ export class Account {
     name: string;
 
     @Prop({ default: null })
-    image: string | null;
+    email: string | null;
 
-    @Prop({ required: true })
-    email: string;
+    @Prop({ default: null })
+    image: string | null;
 
     @Prop({ required: true, type: [Types.ObjectId], ref: Account.name })
     followers: Account[];
+
+    @Prop({ default: null, type: Types.ObjectId, ref: Channel.name })
+    channel: Channel | null;
+
+    @Prop({ required: true, type: [Types.ObjectId], ref: Video.name })
+    videos: Video[];
+
+    @Prop({ required: true, type: [Types.ObjectId], ref: Stream.name })
+    streams: Stream[];
 
     @Prop({ required: true })
     created_at: Date;

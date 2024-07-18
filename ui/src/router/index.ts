@@ -13,6 +13,9 @@ import PortfolioView from '@/views/portfolio/PortfolioView.vue';
 import PortfolioVideos from '@/views/portfolio/PortfolioVideos.vue';
 import PortfolioStreams from '@/views/portfolio/PortfolioStreams.vue';
 import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';
+import GoLive from '@/views/create/GoLive.vue';
+import UploadVideo from '@/views/create/UploadVideo.vue';
+import CreateView from '@/views/create/CreateView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -85,6 +88,23 @@ const router = createRouter({
               path: '/channels/:id/streams',
               name: 'explore-channels-channel-streams',
               component: ChannelStreams
+            }
+          ]
+        },
+        {
+          name: 'create',
+          path: '/create',
+          component: CreateView,
+          children: [
+            {
+              name: 'create-video',
+              path: '/create',
+              component: UploadVideo
+            },
+            {
+              name: 'create-stream',
+              path: '/create/stream',
+              component: GoLive
             }
           ]
         }

@@ -59,15 +59,19 @@ const route = useRoute();
                 </RouterLink>
             </div>
             <div class="filter_items">
-                <div class="filter" v-if="route.name == 'portfolio-videos'">
-                    <ExportIcon />
-                    <p>Upload</p>
-                </div>
+                <RouterLink to="/create" v-if="route.name == 'portfolio-videos'">
+                    <div class="filter">
+                        <ExportIcon />
+                        <p>Upload</p>
+                    </div>
+                </RouterLink>
 
-                <div class="filter" v-if="route.name == 'portfolio-streams'">
-                    <WifiIcon />
-                    <p>Go Live</p>
-                </div>
+                <RouterLink to="/create/stream" v-if="route.name == 'portfolio-streams'">
+                    <div class="filter">
+                        <WifiIcon />
+                        <p>Go Live</p>
+                    </div>
+                </RouterLink>
 
                 <div class="filter" v-if="route.name == 'portfolio-revenue'">
                     <CoinIcon />
@@ -83,7 +87,8 @@ const route = useRoute();
     display: flex;
     flex-direction: column;
     align-items: center;
-    top: -345px;
+    top: -343px;
+    /* -2px */
     position: sticky;
     z-index: 2;
 }
@@ -228,6 +233,7 @@ const route = useRoute();
     justify-content: center;
     position: relative;
     padding: 0 20px;
+    border-bottom: 2px solid transparent;
 }
 
 .tab p {
@@ -259,6 +265,7 @@ const route = useRoute();
     justify-content: center;
     cursor: pointer;
     user-select: none;
+    margin-top: -2px;
 }
 
 .filter p {

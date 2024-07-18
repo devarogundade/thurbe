@@ -216,6 +216,7 @@ const route = useRoute();
     justify-content: center;
     position: relative;
     padding: 0 20px;
+    border-bottom: 2px solid transparent;
 }
 
 .tab p {

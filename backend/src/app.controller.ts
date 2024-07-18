@@ -6,6 +6,7 @@ import { Account } from './database/schemas/account';
 import { Stream } from './database/schemas/stream';
 import { Paged } from './types';
 import { Video } from './database/schemas/video';
+import { Channel } from './database/schemas/channel';
 
 @Controller()
 export class AppController {
@@ -16,10 +17,22 @@ export class AppController {
     @Body() dto: Account
   ): Promise<Account | null> {
     return this.appService.createAccount(
-      dto.address,
+      dto.address.toLocaleLowerCase(),
       dto.name,
       dto.email,
       dto.image
+    );
+  }
+
+  @Post('/create-channel')
+  createChannel(
+    @Body() dto: Channel
+  ): Promise<Channel | null> {
+    return this.appService.createChannel(
+      (dto.owner as string).toLocaleLowerCase(),
+      dto.name,
+      dto.image,
+      dto.cover
     );
   }
 
@@ -29,8 +42,8 @@ export class AppController {
     @Body() streamer: string
   ): Promise<boolean> {
     return this.appService.followAccount(
-      address,
-      streamer,
+      address.toLocaleLowerCase(),
+      streamer.toLocaleLowerCase(),
     );
   }
 
@@ -40,8 +53,8 @@ export class AppController {
     @Body() streamer: string
   ): Promise<boolean> {
     return this.appService.unfollowAccount(
-      address,
-      streamer,
+      address.toLocaleLowerCase(),
+      streamer.toLocaleLowerCase(),
     );
   }
 
@@ -51,10 +64,10 @@ export class AppController {
   ): Promise<Stream | null> {
     return this.appService.createStream(
       dto.streamId,
-      dto.streamer as string,
+      (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
       dto.thumbnail,
-      dto.collection,
+      dto.exclusive,
       dto.playback_uri,
       dto.player_uri,
       dto.tips,
@@ -78,7 +91,7 @@ export class AppController {
     @Body() streamId: string
   ): Promise<boolean> {
     return this.appService.joinStream(
-      address,
+      address.toLocaleLowerCase(),
       streamId,
     );
   }
@@ -89,10 +102,10 @@ export class AppController {
   ): Promise<Video | null> {
     return this.appService.uploadVideo(
       dto.videoId,
-      dto.streamer as string,
+      (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
       dto.thumbnail,
-      dto.collection,
+      dto.exclusive,
       dto.playback_uri,
       dto.tips
     );
@@ -104,7 +117,7 @@ export class AppController {
     @Body() videoId: string
   ): Promise<boolean> {
     return this.appService.watchVideo(
-      address,
+      address.toLocaleLowerCase(),
       videoId,
     );
   }
@@ -112,11 +125,11 @@ export class AppController {
   @Get('/streams')
   getStreams(
     @Query('page') page: number,
-    @Query('streamer') streamer: string | null
+    @Query('streamer') address: string | null
   ): Promise<Paged<Stream[]> | null> {
     return this.appService.getStreams(
       page,
-      streamer,
+      address.toLocaleLowerCase(),
     );
   }
 
@@ -132,11 +145,11 @@ export class AppController {
   @Get('/videos')
   getVideos(
     @Query('page') page: number,
-    @Query('streamer') streamer: string | null
+    @Query('streamer') address: string | null
   ): Promise<Paged<Video[]> | null> {
     return this.appService.getVideos(
       page,
-      streamer,
+      address.toLocaleLowerCase(),
     );
   }
 
@@ -151,10 +164,26 @@ export class AppController {
 
   @Get('/accounts/:id')
   getAccount(
-    @Param('address') address: string,
+    @Param('id') address: string,
   ): Promise<Account | null> {
     return this.appService.getAccount(
-      address
+      address.toLocaleLowerCase()
+    );
+  }
+
+  @Get('/channels')
+  getChannels(
+    @Query('page') page: number
+  ): Promise<Paged<Channel[]> | null> {
+    return this.appService.getChannels(page);
+  }
+
+  @Get('/channels/:id')
+  getChannel(
+    @Param('id') address: string,
+  ): Promise<Channel | null> {
+    return this.appService.getChannel(
+      address.toLocaleLowerCase()
     );
   }
 }

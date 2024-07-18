@@ -19,10 +19,10 @@ import OutIcon from '@/components/icons/OutIcon.vue';
 
                 <div class="tabs">
                     <RouterLink to="/">Home</RouterLink>
-                    <a href="/" target="_blank">Docs
+                    <a href="https://docs.thurbe.xyz" target="_blank">Docs
                         <OutIcon />
                     </a>
-                    <a href="/" target="_blank">Blog
+                    <a href="https://blog.thurbe.xyz" target="_blank">Blog
                         <OutIcon />
                     </a>
                 </div>

@@ -10,14 +10,7 @@ library Hash {
     function tipId(Data.Tip memory tip) internal view returns (bytes32) {
         return
             keccak256(
-                abi.encode(
-                    LEAF_DOMAIN_SEPARATOR,
-                    tip.streamer,
-                    tip.minTip,
-                    tip.maxTip,
-                    tip.targetAmount,
-                    block.timestamp
-                )
+                abi.encode(LEAF_DOMAIN_SEPARATOR, tip.streamer, block.timestamp)
             );
     }
 }

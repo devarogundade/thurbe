@@ -23,7 +23,8 @@ const route = useRoute();
                 <div class="tab_parent">
                     <RouterLink to="/">
                         <div class="title">
-                            <DiscoverIcon :active="(route.name as string)?.startsWith('explore')" />
+                            <DiscoverIcon
+                                :color="(route.name as string)?.startsWith('explore') ? '#161618' : '#ABADAE'" />
                             <h3>Explore</h3>
                             <div
                                 :class="(route.name as string)?.startsWith('explore') ? 'indicator indicator_active' : 'indicator'">
@@ -54,7 +55,8 @@ const route = useRoute();
                 <div class="tab_parent">
                     <RouterLink to="/portfolio">
                         <div class="title">
-                            <AirdropIcon :active="(route.name as string)?.startsWith('portfolio')" />
+                            <AirdropIcon
+                                :color="(route.name as string)?.startsWith('portfolio') ? '#161618' : '#ABADAE'" />
                             <h3>My Channel</h3>
                             <div
                                 :class="(route.name as string)?.startsWith('portfolio') ? 'indicator indicator_active' : 'indicator'">
@@ -154,6 +156,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    border-bottom: 2px solid transparent;
 }
 
 .title {

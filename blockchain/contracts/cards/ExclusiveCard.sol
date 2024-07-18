@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity <=0.8.24;
 
+import {ICard} from "../interfaces/ICard.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-contract ExclusiveCard is ERC721, Ownable {
+contract ExclusiveCard is ERC721, Ownable, ICard {
     uint256 private _tokenId;
 
     uint256 private _mintPrice;
@@ -23,7 +24,7 @@ contract ExclusiveCard is ERC721, Ownable {
         _baseUri = baseURI;
     }
 
-    function mint(address to) external onlyOwner {
+    function mint(address to) external override onlyOwner {
         _mint(to, _tokenId);
         _tokenUris[_tokenId] = _baseUri;
         _tokenId++;
@@ -40,7 +41,7 @@ contract ExclusiveCard is ERC721, Ownable {
         return _tokenUris[tokenId];
     }
 
-    function getMintPrice() external view returns (uint256) {
+    function getMintPrice() external view override returns (uint256) {
         return _mintPrice;
     }
 }

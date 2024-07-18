@@ -32,8 +32,8 @@ export class Video {
     @Prop({ default: 0 })
     views: number;
 
-    @Prop({ default: null })
-    collection: string | null;
+    @Prop({ default: false })
+    exclusive: boolean;
 
     @Prop({ required: true })
     created_at: Date;

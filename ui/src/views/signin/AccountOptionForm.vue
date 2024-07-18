@@ -39,14 +39,14 @@ const createAccount = () => {
             walletStore.address,
             (photoURL: string) => {
                 form.value.image = photoURL;
-                emit('continue', form);
+                emit('continue', form.value);
             },
             () => {
                 form.value.image = null;
-                emit('continue', form);
+                emit('continue', form.value);
             });
     } else {
-        emit('continue', form);
+        emit('continue', form.value);
     }
 };
 </script>

@@ -41,17 +41,14 @@ export class Stream {
     @Prop({ required: true, type: [Types.ObjectId], ref: Account.name })
     viewers: Account[];
 
-    @Prop({ default: null })
-    collection: string | null;
+    @Prop({ default: false })
+    exclusive: boolean;
 
     @Prop({ required: true })
     created_at: Date;
 
     @Prop({ required: true })
     start_at: Date;
-
-    @Prop({ default: false })
-    mailSent: boolean;
 }
 
 export const StreamSchema = SchemaFactory.createForClass(Stream);

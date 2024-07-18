@@ -1,34 +1,46 @@
 <script setup lang="ts">
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
+import { type Video, type Account } from "@/types";
+import { ref } from "vue";
+// @ts-ignore
+import { format as formatDate } from 'timeago.js';
+import Converter from '@/scripts/converter';
+
+const videos = ref<Video[]>([]);
 </script>
 
 <template>
-    <div class="videos">
-        <RouterLink v-for="num, index in 14" :key="index" :to="`/videos/${num}`">
+    <div class="videos" v-if="videos.length > 0">
+        <RouterLink v-for="video, index in videos" :key="index" :to="`/videos/${video.videoId}`">
             <div class="video">
                 <div class="thumbnail">
-                    <img src="/images/game.png" alt="">
+                    <img :src="video.thumbnail" alt="">
                     <div class="play_button"></div>
                 </div>
                 <div class="detail">
                     <div class="detail_content">
-                        <img src="/images/game.png" alt="">
+                        <img :src="(video.streamer as Account).channel?.image" alt="">
                         <div class="detail_text">
-                            <h3>Top 10 Best Cartoon Movies</h3>
-                            <p>The CartoonistGuy. 6 Days ago</p>
+                            <h3>{{ video.name }}</h3>
+                            <p>{{ (video.streamer as Account).channel?.name }}. {{ formatDate(video.created_at) }}</p>
                         </div>
                     </div>
 
                     <div class="detail_view">
                         <div class="views">Views</div>
                         <div class="views_count">
-                            <p>25.4k</p>
+                            <p>{{ Converter.formatNumber(video.views) }}</p>
                             <UserGroupIcon />
                         </div>
                     </div>
                 </div>
             </div>
         </RouterLink>
+    </div>
+
+    <div class="empty" v-else>
+        <img src="/images/empty.png" alt="">
+        <p>No videos.</p>
     </div>
 </template>
 

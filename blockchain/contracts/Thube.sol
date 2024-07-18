@@ -4,10 +4,12 @@ pragma solidity <=0.8.24;
 import {Data} from "./libraries/Data.sol";
 import {Hash} from "./libraries/Hash.sol";
 import {IThube} from "./interfaces/IThube.sol";
+import {ICard} from "./interfaces/ICard.sol";
 import {CardProvider} from "./providers/CardProvider.sol";
 import {TipProvider} from "./providers/TipProvider.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Thube is IThube, AccessControl, Pausable {
     CardProvider private _cardProvider;
@@ -16,24 +18,33 @@ contract Thube is IThube, AccessControl, Pausable {
     mapping(bytes32 => Data.Stream) private _streams;
     mapping(address => Data.Streamer) private _streamers;
 
-    constructor() {
+    IERC20 private _thurbeToken;
+
+    constructor(address thurbeToken) {
         // Create providers.
         _cardProvider = new CardProvider(address(this));
         _tipProvider = new TipProvider(address(this));
 
         // Grant admin role.
         _grantRole(DEFAULT_ADMIN_ROLE, _msgSender());
+
+        _thurbeToken = IERC20(thurbeToken);
     }
 
-    function createStreamer(
-        string memory inclusiveCardBaseURI
-    ) external override {
+    function create(string memory cardBaseURI) external override {
         address streamer = _msgSender();
+
         require(_streamers[streamer].createdAt == 0);
 
-        _cardProvider.createInclusiveCard(streamer, inclusiveCardBaseURI);
+        _streamers[streamer] = Data.Streamer({
+            totalUnClaimedTfuel: 0,
+            totalClaimedTfuel: 0,
+            totalUnClaimedThurbe: 0,
+            totalClaimedThurbe: 0,
+            createdAt: block.timestamp
+        });
 
-        _streamers[streamer] = Data.Streamer({createdAt: block.timestamp});
+        _cardProvider.createCard(streamer, cardBaseURI);
 
         emit StreamerCreated(streamer);
     }
@@ -43,8 +54,9 @@ contract Thube is IThube, AccessControl, Pausable {
         string memory symbol,
         uint256 mintPrice,
         string memory baseURI
-    ) external {
+    ) external override {
         address streamer = _msgSender();
+
         require(_streamers[streamer].createdAt > 0);
 
         _cardProvider.createExclusiveCard(
@@ -56,39 +68,34 @@ contract Thube is IThube, AccessControl, Pausable {
         );
     }
 
-    // === Creator Functions ===
-    function startInclusiveStream(
-        bytes32 streamId
-    ) external whenNotPaused returns (bytes32) {
+    // === Streamer Functions ===
+    function startStream(
+        bytes32 streamId,
+        bool exclusive
+    ) external override whenNotPaused {
         address streamer = _msgSender();
 
-        address cardId = _cardProvider.getInclusiveCard(streamer);
+        address cardId = exclusive
+            ? _cardProvider.getExclusiveCard(streamer)
+            : _cardProvider.getCard(streamer);
+
         require(cardId != address(0), "Inclusive card not created");
 
-        return _startStream(streamId, streamer, cardId);
-    }
-
-    function startExclusiveStream(
-        bytes32 streamId
-    ) external whenNotPaused returns (bytes32) {
-        address streamer = _msgSender();
-
-        address cardId = _cardProvider.getExclusiveCard(streamer);
-        require(cardId != address(0), "Exclusive card not created");
-
-        return _startStream(streamId, streamer, cardId);
+        _startStream(streamId, streamer, cardId);
     }
 
     function endStream(bytes32 streamId) external whenNotPaused {
         address streamer = _msgSender();
 
         Data.Stream storage stream = _streams[streamId];
-        require(stream.streamer == streamer);
-        require(stream.ongoing, "Stream is not active.");
+        require(stream.streamer == streamer, "Not owner");
+        require(stream.ongoing, "Stream is not ongoing.");
         require(!stream.ended, "Stream has already ended.");
 
-        if (stream.tipId != bytes32(0) && !_tipProvider.isEnded(stream.tipId)) {
-            _tipProvider.end(streamer, stream.tipId);
+        if (
+            stream.tipId != bytes32(0) && !_tipProvider.isPaused(stream.tipId)
+        ) {
+            _tipProvider.pause(streamer, stream.tipId);
         }
 
         stream.ongoing = false;
@@ -97,27 +104,13 @@ contract Thube is IThube, AccessControl, Pausable {
         emit StreamEnded(streamId);
     }
 
-    // === Creator-Tip Functions ===
-    function startTip(
-        bytes32 streamId,
-        uint256 minTip,
-        uint256 maxTip,
-        uint256 targetAmount
-    ) external whenNotPaused returns (bytes32) {
+    function startTip(bytes32 streamId) external override whenNotPaused {
         address streamer = _msgSender();
 
-        bytes32 tipId = _tipProvider.create(
-            streamer,
-            minTip,
-            maxTip,
-            targetAmount
-        );
-
+        bytes32 tipId = _tipProvider.start(streamer);
         _streams[streamId].tipId = tipId;
 
-        emit StreamTipCreated(streamId, tipId, minTip, maxTip, targetAmount);
-
-        return tipId;
+        emit StreamTipCreated(streamId, tipId);
     }
 
     function pauseTip(bytes32 streamId) external whenNotPaused {
@@ -131,57 +124,72 @@ contract Thube is IThube, AccessControl, Pausable {
         emit StreamPaused(streamId);
     }
 
-    function resumeTip(bytes32 streamId) external whenNotPaused {
+    function claimTips(uint256 amount) external whenNotPaused {
         address streamer = _msgSender();
 
-        Data.Stream memory stream = _streams[streamId];
-        require(stream.tipId != bytes32(0), "No stream tip");
+        Data.Streamer storage streamerData = _streamers[streamer];
+        require(streamerData.totalUnClaimedThurbe >= amount, "Insufficient");
 
-        _tipProvider.resume(streamer, stream.tipId);
+        _thurbeToken.transfer(streamer, amount);
 
-        emit StreamResumed(streamId);
+        streamerData.totalUnClaimedThurbe -= amount;
+        streamerData.totalClaimedThurbe += amount;
+
+        emit ClaimedThurbe(streamer, amount);
     }
 
-    function endTip(bytes32 streamId) external whenNotPaused {
+    function claimEarnigs(uint256 amount) external whenNotPaused {
         address streamer = _msgSender();
 
-        Data.Stream memory stream = _streams[streamId];
-        require(stream.tipId != bytes32(0), "No stream tip");
+        Data.Streamer storage streamerData = _streamers[streamer];
+        require(streamerData.totalUnClaimedTfuel >= amount, "Insufficient");
 
-        _tipProvider.end(streamer, stream.tipId);
+        payable(streamer).transfer(amount);
 
-        emit StreamTipEnded(streamId, stream.tipId);
+        streamerData.totalUnClaimedTfuel -= amount;
+        streamerData.totalClaimedTfuel += amount;
+
+        emit ClaimedTfuel(streamer, amount);
     }
 
-    function claimTip(bytes32 streamId) external whenNotPaused {
-        address streamer = _msgSender();
-
-        Data.Stream memory stream = _streams[streamId];
-        require(stream.tipId != bytes32(0), "No stream tip");
-
-        uint256 raisedAmount = _tipProvider.claim(streamer, stream.tipId);
-
-        payable(stream.streamer).transfer(raisedAmount);
-
-        emit StreamTipClaimed(streamId);
-    }
-
-    // === Streamer Functions ===
-    function donateStream(bytes32 streamId) external payable whenNotPaused {
+    // === Viewers Functions ===
+    function tipStream(
+        bytes32 streamId,
+        uint256 amount
+    ) external whenNotPaused {
         address viewer = _msgSender();
 
+        _thurbeToken.transferFrom(viewer, address(this), amount);
+
         Data.Stream memory stream = _streams[streamId];
         require(stream.tipId != bytes32(0), "No stream tip");
+
+        _tipProvider.tipStreamer(stream.tipId, amount);
+
+        Data.Streamer storage streamerData = _streamers[stream.streamer];
+        streamerData.totalUnClaimedThurbe += amount;
+
+        emit StreamTip(streamId, viewer, amount);
+    }
+
+    function mintCard(
+        address streamer,
+        address to,
+        bool exclusive
+    ) external payable override {
+        address cardId = exclusive
+            ? _cardProvider.getExclusiveCard(streamer)
+            : _cardProvider.getCard(streamer);
 
         uint256 amount = msg.value;
 
-        uint256 raisedAmount = _tipProvider.donate(
-            stream.tipId,
-            viewer,
-            amount
-        );
+        ICard card = ICard(cardId);
+        require(amount >= card.getMintPrice());
 
-        emit StreamDonated(streamId, raisedAmount, viewer, amount);
+        Data.Streamer storage streamerData = _streamers[streamer];
+        streamerData.totalUnClaimedTfuel += amount;
+
+        _cardProvider.mintCard(cardId, to);
     }
 
     // === Internal Functions ===
@@ -189,7 +197,7 @@ contract Thube is IThube, AccessControl, Pausable {
         bytes32 streamId,
         address streamer,
         address cardId
-    ) internal returns (bytes32) {
+    ) internal {
         require(_streams[streamId].streamer == address(0));
 
         Data.Stream memory stream = Data.Stream({
@@ -203,8 +211,6 @@ contract Thube is IThube, AccessControl, Pausable {
         _streams[streamId] = stream;
 
         emit StreamCreated(streamer, cardId);
-
-        return streamId;
     }
 
     function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -11,17 +11,16 @@ library Data {
     }
 
     struct Streamer {
+        uint256 totalUnClaimedTfuel;
+        uint256 totalClaimedTfuel;
+        uint256 totalUnClaimedThurbe;
+        uint256 totalClaimedThurbe;
         uint256 createdAt;
     }
 
     struct Tip {
         address streamer;
-        uint256 minTip;
-        uint256 maxTip;
-        uint256 targetAmount;
         uint256 raisedAmount;
         bool paused;
-        bool ended;
-        bool claimed;
     }
 }

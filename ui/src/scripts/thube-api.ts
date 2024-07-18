@@ -1,8 +1,8 @@
-import type { Account, Paged, React, Stream, Tip, Video } from '@/types';
+import type { Account, Channel, Paged, React, Stream, Tip, Video } from '@/types';
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: 'https://api.thetavideoapi.com'
+    baseURL: 'http://localhost:8080'
 });
 
 const ThubeAPI = {
@@ -15,6 +15,24 @@ const ThubeAPI = {
         try {
             const response = await client.post('/create-account', {
                 address, name, email, image
+            });
+
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
+    async createChannel(
+        address: string,
+        name: string,
+        image: string,
+        cover: string | null
+    ): Promise<Account | null> {
+        try {
+            const response = await client.post('/create-channel', {
+                address, name, image, cover
             });
 
             return response.data;
@@ -55,7 +73,7 @@ const ThubeAPI = {
         address: string,
         name: string,
         thumbnail: string,
-        collection: string,
+        exclusive: boolean,
         playback_uri: string | null,
         player_uri: string | null,
         tips: boolean,
@@ -64,7 +82,7 @@ const ThubeAPI = {
         try {
             const response = await client.post('/create-stream', {
                 streamId, address, name, thumbnail,
-                collection, playback_uri, player_uri, tips, start_at
+                exclusive, playback_uri, player_uri, tips, start_at
             });
 
             return response.data;
@@ -92,14 +110,14 @@ const ThubeAPI = {
         address: string,
         name: string,
         thumbnail: string,
-        collection: string,
+        exclusive: boolean,
         playback_uri: string | null,
         tips: boolean,
     ): Promise<Video | null> {
         try {
             const response = await client.post('/upload-video', {
                 videoId, address, name, thumbnail,
-                collection, playback_uri, tips
+                exclusive, playback_uri, tips
             });
 
             return response.data;
@@ -187,6 +205,30 @@ const ThubeAPI = {
     ): Promise<Account | null> {
         try {
             const response = await client.get(`/accounts/${address}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
+    async getChannels(
+        page: number,
+    ): Promise<Channel[]> {
+        try {
+            const response = await client.get(`/channels?page=${page}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    },
+
+    async getChannel(
+        address: string
+    ): Promise<Channel | null> {
+        try {
+            const response = await client.get(`/channels/${address}`);
             return response.data;
         } catch (error) {
             console.error(error);

@@ -14,6 +14,7 @@ import { MailWorker } from './worker/mail';
 // import { ScheduleModule } from '@nestjs/schedule';
 import { MainGateway } from './socket/main.gateway';
 import { Video } from './database/schemas/video';
+import { Channel, ChannelSchema } from './database/schemas/channel';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { Video } from './database/schemas/video';
       { name: Stream.name, schema: StreamSchema },
       { name: Account.name, schema: AccountSchema },
       { name: Video.name, schema: VideoSchema },
+      { name: Channel.name, schema: ChannelSchema },
     ])
   ],
   controllers: [AppController],

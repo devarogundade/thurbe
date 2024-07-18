@@ -20,6 +20,7 @@
     "pinia": "^2.1.7",
     "simple-peer": "^9.11.1",
     "socket.io-client": "^4.7.5",
+    "timeago.js": "^4.0.2",
     "video.js": "^8.16.1",
     "videojs-flash": "^2.2.1",
     "viem": "^2.17.3",

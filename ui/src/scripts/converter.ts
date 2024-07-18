@@ -11,6 +11,18 @@ const Converter = {
         return hash.substring(0, space) + '...' + hash.substring(hash.length - space, hash.length);
     },
 
+    formatNumber: function (value: number) {
+        if (value >= 1e9) {
+            return (value / 1e9).toFixed(1) + 'b';
+        } else if (value >= 1e6) {
+            return (value / 1e6).toFixed(1) + 'm';
+        } else if (value >= 1e3) {
+            return (value / 1e3).toFixed(1) + 'k';
+        } else {
+            return value.toString();
+        }
+    },
+
     fromWei: function (wei: string) {
         try {
             if (wei == '' || wei == '0') return '0';

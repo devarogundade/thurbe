@@ -2,22 +2,34 @@
 import UserAddIcon from '@/components/icons/UserAddIcon.vue';
 import VideoCircleIcon from '@/components/icons/VideoCircleIcon.vue';
 import RadarIcon from '@/components/icons/RadarIcon.vue';
+import { type Channel, type Account } from "@/types";
+import { onMounted, ref } from "vue";
+
+const channels = ref<Channel[]>([]);
+
+const getChannels = () => {
+
+};
+
+
+onMounted(() => {
+    getChannels();
+});
 </script>
 
 <template>
-    <div class="channels">
-        <RouterLink v-for="num, index in 14" :key="index" :to="`/channels/${num}`">
+    <div class="channels" v-if="channels.length > 0">
+        <RouterLink v-for="channel, index in channels" :key="index" :to="`/channels/${channel.owner.address}`">
             <div class="channel">
                 <div class="thumbnail">
-                    <img src="/images/game.png" alt="">
-                    <div class="play_button"></div>
+                    <img :src="channel.cover || '/images/image_default.png'" alt="">
                 </div>
                 <div class="detail">
                     <div class="detail_content">
-                        <img src="/images/game.png" alt="">
+                        <img :src="channel.image" alt="">
                         <div class="detail_text">
-                            <h3>Top 10 Best Cartoon Movies</h3>
-                            <p>The CartoonistGuy. 6 Days ago</p>
+                            <h3>{{ channel.name }}</h3>
+                            <p><span>{{ channel.owner.followers.length }} Followers</span></p>
                         </div>
                     </div>
 
@@ -29,16 +41,21 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
                 <div class="stats">
                     <div class="stat">
                         <VideoCircleIcon />
-                        <p><span>21</span> Videos</p>
+                        <p><span>{{ channel.owner.videos.length }}</span> Videos</p>
                     </div>
 
                     <div class="stat">
                         <RadarIcon />
-                        <p><span>59</span> Streams</p>
+                        <p><span>{{ channel.owner.streams.length }}</span> Streams</p>
                     </div>
                 </div>
             </div>
         </RouterLink>
+    </div>
+
+    <div class="empty" v-else>
+        <img src="/images/empty.png" alt="">
+        <p>No channels.</p>
     </div>
 </template>
 

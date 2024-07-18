@@ -5,35 +5,33 @@ interface IThube {
     event StreamPaused(bytes32 streamId);
     event StreamResumed(bytes32 streamId);
     event StreamEnded(bytes32 streamId);
-    event StreamTipCreated(
-        bytes32 streamId,
-        bytes32 tipId,
-        uint256 minTip,
-        uint256 maxTip,
-        uint256 targetAmount
-    );
+    event StreamTipCreated(bytes32 streamId, bytes32 tipId);
     event StreamTipClaimed(bytes32 streamId);
-    event StreamDonated(
-        bytes32 streamId,
-        uint256 raisedAmount,
-        address viewer,
-        uint256 amount
-    );
+    event StreamTip(bytes32 streamId, address viewer, uint256 amount);
     event StreamTipEnded(bytes32 streamId, bytes32 tipId);
     event StreamCreated(address streamer, address cardId);
     event StreamerCreated(address streamer);
+    event ClaimedThurbe(address streamer, uint256 amount);
+    event ClaimedTfuel(address streamer, uint256 amount);
 
-    function createStreamer(string memory inclusiveCardBaseURI) external;
-    function startInclusiveStream(bytes32 streamId) external returns (bytes32);
-    function startExclusiveStream(bytes32 streamId) external returns (bytes32);
-    function startTip(
-        bytes32 streamId,
-        uint256 minTip,
-        uint256 maxTip,
-        uint256 targetAmount
-    ) external returns (bytes32);
+    // === Streamer Functions ===
+    function create(string memory cardBaseURI) external;
+    function createExclusiveCard(
+        string memory name,
+        string memory symbol,
+        uint256 mintPrice,
+        string memory baseURI
+    ) external;
+    function startStream(bytes32 streamId, bool exclusive) external;
+    function endStream(bytes32 streamId) external;
+    function startTip(bytes32 streamId) external;
     function pauseTip(bytes32 streamId) external;
-    function resumeTip(bytes32 streamId) external;
-    function endTip(bytes32 streamId) external;
-    function donateStream(bytes32 streamId) external payable;
+
+    // === Viewers Functions ===
+    function tipStream(bytes32 streamId, uint256 amount) external;
+    function mintCard(
+        address streamer,
+        address to,
+        bool exclusive
+    ) external payable;
 }

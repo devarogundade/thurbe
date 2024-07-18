@@ -1,34 +1,54 @@
 <script setup lang="ts">
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
+import { type Stream, type Account } from "@/types";
+import { onMounted, ref } from "vue";
+// @ts-ignore
+import { format as formatDate } from 'timeago.js';
+import Converter from '@/scripts/converter';
+
+const getStreams = () => {
+
+};
+
+const streams = ref<Stream[]>([]);
+
+onMounted(() => {
+    getStreams();
+});
 </script>
 
 <template>
-    <div class="streams">
-        <RouterLink v-for="num, index in 14" :key="index" :to="`/streams/${num}`">
+    <div class="streams" v-if="streams.length > 0">
+        <RouterLink v-for="stream, index in streams" :key="index" :to="`/streams/${stream.streamId}`">
             <div class="stream">
                 <div class="thumbnail">
-                    <img src="/images/game.png" alt="">
+                    <img :src="stream.thumbnail" alt="">
                     <div class="play_button"></div>
                 </div>
                 <div class="detail">
                     <div class="detail_content">
-                        <img src="/images/game.png" alt="">
+                        <img :src="(stream.streamer as Account).channel?.image" alt="">
                         <div class="detail_text">
-                            <h3>Top 10 Best Cartoon Movies</h3>
-                            <p>The CartoonistGuy. 6 Days ago</p>
+                            <h3>{{ stream.name }}</h3>
+                            <p>{{ (stream.streamer as Account).channel?.name }}. {{ formatDate(stream.created_at) }}</p>
                         </div>
                     </div>
 
                     <div class="detail_view">
                         <div class="views">Viewers</div>
                         <div class="views_count">
-                            <p>25.4k</p>
+                            <p>{{ Converter.formatNumber(stream.viewers.length) }}</p>
                             <UserGroupIcon />
                         </div>
                     </div>
                 </div>
             </div>
         </RouterLink>
+    </div>
+
+    <div class="empty" v-else>
+        <img src="/images/empty.png" alt="">
+        <p>No created streams.</p>
     </div>
 </template>
 
