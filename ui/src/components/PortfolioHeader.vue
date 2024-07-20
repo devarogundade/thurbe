@@ -5,6 +5,7 @@ import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
 import ExportIcon from '@/components/icons/ExportIcon.vue';
 import WifiIcon from '@/components/icons/WifiIcon.vue';
 import CoinIcon from '@/components/icons/CoinIcon.vue';
+import GoLiveOption from '@/views/pops/GoLiveOption.vue';
 
 import { useRoute } from 'vue-router';
 
@@ -79,6 +80,8 @@ const route = useRoute();
                 </div>
             </div>
         </div>
+
+        <GoLiveOption :account="{}" />
     </div>
 </template>
 
