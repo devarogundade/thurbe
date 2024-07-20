@@ -13,7 +13,7 @@ const client = axios.create({
 const ThetaAPI = {
     async uploadVideo(
         name: string,
-        fileContents: any,
+        file: File,
         // nft_collection: string,
     ): Promise<string | null> {
         try {
@@ -21,7 +21,7 @@ const ThetaAPI = {
 
             const data = createURL.data.body.uploads[0];
 
-            await client.put(createURL.data.presigned_url, fileContents);
+            await client.put(createURL.data.presigned_url, file);
 
             const options = {
                 "source_upload_id": data.id,

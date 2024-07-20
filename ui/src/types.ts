@@ -9,10 +9,27 @@ export enum AccountType {
     Manual
 }
 
+export enum ViewerType {
+    Everyone,
+    Follower,
+    SuperFollower
+}
+
 export type AccountForm = {
     name: string | null,
     email: string | null,
     image: string | null;
+};
+
+export type VideoForm = {
+    file: File | undefined;
+    name: string | undefined;
+    description: string | null;
+    thumbnail: File | undefined;
+    thumbnail_file_url: string | undefined;
+    file_url: string | undefined;
+    viewerType: ViewerType;
+    tips: boolean;
 };
 
 export type Token = {

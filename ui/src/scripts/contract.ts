@@ -5,13 +5,14 @@ import { waitForTransactionReceipt, writeContract } from '@wagmi/core';
 export const thubeId: `0x${string}` = '0x';
 
 const Contract = {
-    async createStreamer(inclusiveCardBaseURI: string): Promise<`0x${string}` | null> {
+    // === Streamer Functions ===
+    async createStreamer(cardBaseURI: string): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
                 abi: thubeAbi,
                 address: thubeId,
-                functionName: 'createStreamer',
-                args: [inclusiveCardBaseURI]
+                functionName: 'create',
+                args: [cardBaseURI]
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -23,13 +24,18 @@ const Contract = {
         }
     },
 
-    async startInclusiveStream(streamId: `0x${string}`): Promise<`0x${string}` | null> {
+    async createExclusiveCard(
+        name: string,
+        symbol: string,
+        mintPrice: string,
+        baseURI: string
+    ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
                 abi: thubeAbi,
                 address: thubeId,
-                functionName: 'startInclusiveStream',
-                args: [streamId]
+                functionName: 'createExclusiveCard',
+                args: [name, symbol, mintPrice, baseURI]
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -41,13 +47,31 @@ const Contract = {
         }
     },
 
-    async startExclusiveStream(streamId: `0x${string}`): Promise<`0x${string}` | null> {
+    async startStream(streamId: `0x${string}`, exclusive: boolean, tips: boolean): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
                 abi: thubeAbi,
                 address: thubeId,
-                functionName: 'startExclusiveStream',
-                args: [streamId]
+                functionName: 'startStream',
+                args: [streamId, exclusive, tips]
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async uploadVideo(videoId: `0x${string}`, exclusive: boolean, tips: boolean): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thubeAbi,
+                address: thubeId,
+                functionName: 'uploadVideo',
+                args: [videoId, exclusive, tips]
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -66,29 +90,6 @@ const Contract = {
                 address: thubeId,
                 functionName: 'endStream',
                 args: [streamId]
-            });
-
-            const receipt = await waitForTransactionReceipt(config, { hash: result });
-
-            return receipt.transactionHash;
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    },
-
-    async startTip(
-        streamId: `0x${string}`,
-        minTip: string,
-        maxTip: string,
-        targetAmount: string
-    ): Promise<`0x${string}` | null> {
-        try {
-            const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
-                functionName: 'startTip',
-                args: [streamId, minTip, maxTip, targetAmount]
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -120,47 +121,8 @@ const Contract = {
         }
     },
 
-    async resumeTip(
-        streamId: `0x${string}`
-    ): Promise<`0x${string}` | null> {
-        try {
-            const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
-                functionName: 'resumeTip',
-                args: [streamId]
-            });
-
-            const receipt = await waitForTransactionReceipt(config, { hash: result });
-
-            return receipt.transactionHash;
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    },
-
-    async endTip(
-        streamId: `0x${string}`
-    ): Promise<`0x${string}` | null> {
-        try {
-            const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
-                functionName: 'endTip',
-                args: [streamId]
-            });
-
-            const receipt = await waitForTransactionReceipt(config, { hash: result });
-
-            return receipt.transactionHash;
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    },
-
-    async donateStream(
+    // === Viewers Functions ===
+    async tipStream(
         streamId: `0x${string}`,
         amount: string
     ): Promise<`0x${string}` | null> {
@@ -168,9 +130,8 @@ const Contract = {
             const result = await writeContract(config, {
                 abi: thubeAbi,
                 address: thubeId,
-                functionName: 'donateStream',
-                args: [streamId],
-                value: BigInt(amount)
+                functionName: 'tipStream',
+                args: [streamId, BigInt(amount)],
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -180,6 +141,57 @@ const Contract = {
             console.log(error);
             return null;
         }
+    },
+
+    async tipVideo(
+        videoId: `0x${string}`,
+        amount: string
+    ): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thubeAbi,
+                address: thubeId,
+                functionName: 'tipVideo',
+                args: [videoId, BigInt(amount)],
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async mintCard(
+        streamer: `0x${string}`,
+        to: `0x${string}`,
+        exclusive: boolean
+    ): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thubeAbi,
+                address: thubeId,
+                functionName: 'mintCard',
+                args: [streamer, to, exclusive],
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    newVideoId(): `0x${string}` {
+        return `0x${'ab'}`;
+    },
+
+    newStreamId(): `0x${string}` {
+        return `0x${'ab'}`;
     }
 };
 

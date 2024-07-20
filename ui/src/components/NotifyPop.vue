@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import CloseIcon from './icons/CloseIcon.vue';
+import SuccessIcon from './icons/SuccessIcon.vue';
+import FailedIcon from './icons/FailedIcon.vue';
+import OutIcon from './icons/OutIcon.vue';
+
+import { notify } from '../reactives/notify';
+
+const removeIndex = (index: number) => {
+    notify.remove(index);
+};
+</script>
+
 <template>
     <main>
         <div class="snackbars">
@@ -33,19 +46,6 @@
     </main>
 </template>
 
-<script setup lang="ts">
-import CloseIcon from './icons/CloseIcon.vue';
-import SuccessIcon from './icons/SuccessIcon.vue';
-import FailedIcon from './icons/FailedIcon.vue';
-import OutIcon from './icons/OutIcon.vue';
-
-import { notify } from '../reactives/notify';
-
-const removeIndex = (index: number) => {
-    notify.remove(index);
-};
-</script>
-
 <style scoped>
 .snackbars {
     position: fixed;
@@ -57,8 +57,8 @@ const removeIndex = (index: number) => {
 
 .snackbar {
     width: 580px;
-    background: #181A1C;
-    box-shadow: 0px 6px 12px rgba(20, 20, 22, 0.8);
+    background: var(--bg-darkest);
+    box-shadow: 0px 6px 12px rgba(192, 192, 192, 0.8);
     border-radius: 4px;
     margin-bottom: 25px;
     padding: 20px 16px;
@@ -111,13 +111,13 @@ const removeIndex = (index: number) => {
 
 .texts h3 {
     font-size: 16px;
-    color: #fff;
+    color: var(--tx-normal);
 }
 
 .texts p {
     font-size: 14px;
     margin-top: 14px;
-    color: #9a9d9f;
+    color: var(--tx-dimmed);
 }
 
 .link {

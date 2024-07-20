@@ -1,4 +1,4 @@
-import type { Account, Channel, Paged, React, Stream, Tip, Video } from '@/types';
+import type { Account, Channel, Paged, React, Stream, Tip, Video, ViewerType } from '@/types';
 import axios from 'axios';
 
 const client = axios.create({
@@ -109,15 +109,16 @@ const ThurbeAPI = {
         videoId: string,
         address: string,
         name: string,
+        description: string | null,
         thumbnail: string,
-        exclusive: boolean,
+        viewerType: ViewerType,
         playback_uri: string | null,
         tips: boolean,
     ): Promise<Video | null> {
         try {
             const response = await client.post('/upload-video', {
                 videoId, address, name, thumbnail,
-                exclusive, playback_uri, tips
+                viewerType, playback_uri, tips
             });
 
             return response.data;

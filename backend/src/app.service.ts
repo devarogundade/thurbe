@@ -6,7 +6,7 @@ import { JobsOptions, Queue } from 'bullmq';
 import { Injectable } from '@nestjs/common';
 import { Account } from './database/schemas/account';
 import { Stream } from './database/schemas/stream';
-import { Paged } from './types';
+import { Paged, ViewerType } from './types';
 import { Video } from './database/schemas/video';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Channel } from './database/schemas/channel';
@@ -123,7 +123,7 @@ export class AppService {
     address: string,
     name: string,
     thumbnail: string,
-    exclusive: boolean,
+    viewerType: ViewerType,
     playback_uri: string | null,
     player_uri: string | null,
     tips: boolean,
@@ -142,9 +142,8 @@ export class AppService {
         player_uri,
         stream_server: '',
         stream_key: '',
-        tx_hash: null,
         tips,
-        exclusive,
+        viewerType,
         created_at: new Date(),
         start_at,
         viewers: []
@@ -225,7 +224,7 @@ export class AppService {
     address: string,
     name: string,
     thumbnail: string,
-    exclusive: boolean,
+    viewerType: ViewerType,
     playback_uri: string | null,
     tips: boolean,
   ): Promise<Video | null> {
@@ -240,7 +239,7 @@ export class AppService {
         streamer: address,
         playback_uri,
         tips,
-        exclusive,
+        viewerType,
         created_at: new Date(),
         viewers: [],
         views: 0

@@ -81,7 +81,7 @@ const route = useRoute();
             </div>
         </div>
 
-        <GoLiveOption :account="{}" />
+        <!-- <GoLiveOption :account="{}" /> -->
     </div>
 </template>
 

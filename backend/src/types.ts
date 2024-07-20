@@ -6,3 +6,9 @@ export type Paged<T> = {
     data?: T;
     extra?: string;
 };
+
+export enum ViewerType {
+    Everyone,
+    Follower,
+    SuperFollower
+}

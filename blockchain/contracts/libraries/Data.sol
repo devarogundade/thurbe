@@ -10,6 +10,12 @@ library Data {
         bool ended;
     }
 
+    struct Video {
+        address streamer;
+        bytes32 tipId;
+        address cardId;
+    }
+
     struct Streamer {
         uint256 totalUnClaimedTfuel;
         uint256 totalClaimedTfuel;

@@ -3,6 +3,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Account } from './account';
+import { ViewerType } from 'src/types';
 
 export type StreamDocument = HydratedDocument<Stream>;
 
@@ -32,17 +33,14 @@ export class Stream {
     @Prop({ default: null })
     stream_key: string | null;
 
-    @Prop({ default: null })
-    tx_hash: string | null;
-
     @Prop({ required: true })
     tips: boolean;
 
     @Prop({ required: true, type: [Types.ObjectId], ref: Account.name })
     viewers: Account[];
 
-    @Prop({ default: false })
-    exclusive: boolean;
+    @Prop({ required: true })
+    viewerType: ViewerType;
 
     @Prop({ required: true })
     created_at: Date;

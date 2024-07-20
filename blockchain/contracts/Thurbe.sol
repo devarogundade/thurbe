@@ -3,7 +3,7 @@ pragma solidity <=0.8.24;
 
 import {Data} from "./libraries/Data.sol";
 import {Hash} from "./libraries/Hash.sol";
-import {IThube} from "./interfaces/IThube.sol";
+import {IThube} from "./interfaces/IThurbe.sol";
 import {ICard} from "./interfaces/ICard.sol";
 import {CardProvider} from "./providers/CardProvider.sol";
 import {TipProvider} from "./providers/TipProvider.sol";
@@ -16,6 +16,7 @@ contract Thurbe is IThube, AccessControl, Pausable {
     TipProvider private _tipProvider;
 
     mapping(bytes32 => Data.Stream) private _streams;
+    mapping(bytes32 => Data.Video) private _videos;
     mapping(address => Data.Streamer) private _streamers;
 
     IERC20 private _thurbeToken;
@@ -71,7 +72,8 @@ contract Thurbe is IThube, AccessControl, Pausable {
     // === Streamer Functions ===
     function startStream(
         bytes32 streamId,
-        bool exclusive
+        bool exclusive,
+        bool tips
     ) external override whenNotPaused {
         address streamer = _msgSender();
 
@@ -82,6 +84,30 @@ contract Thurbe is IThube, AccessControl, Pausable {
         require(cardId != address(0), "Inclusive card not created");
 
         _startStream(streamId, streamer, cardId);
+
+        if (tips) {
+            _streams[streamId].tipId = _startTip(streamId);
+        }
+    }
+
+    function uploadVideo(
+        bytes32 videoId,
+        bool exclusive,
+        bool tips
+    ) external override whenNotPaused {
+        address streamer = _msgSender();
+
+        address cardId = exclusive
+            ? _cardProvider.getExclusiveCard(streamer)
+            : _cardProvider.getCard(streamer);
+
+        require(cardId != address(0), "Inclusive card not created");
+
+        _startVideo(videoId, streamer, cardId);
+
+        if (tips) {
+            _videos[videoId].tipId = _startTip(videoId);
+        }
     }
 
     function endStream(bytes32 streamId) external whenNotPaused {
@@ -104,13 +130,13 @@ contract Thurbe is IThube, AccessControl, Pausable {
         emit StreamEnded(streamId);
     }
 
-    function startTip(bytes32 streamId) external override whenNotPaused {
+    function _startTip(bytes32 id) internal returns (bytes32) {
         address streamer = _msgSender();
 
         bytes32 tipId = _tipProvider.start(streamer);
-        _streams[streamId].tipId = tipId;
+        emit TipCreated(id, tipId);
 
-        emit StreamTipCreated(streamId, tipId);
+        return tipId;
     }
 
     function pauseTip(bytes32 streamId) external whenNotPaused {
@@ -169,7 +195,23 @@ contract Thurbe is IThube, AccessControl, Pausable {
         Data.Streamer storage streamerData = _streamers[stream.streamer];
         streamerData.totalUnClaimedThurbe += amount;
 
-        emit StreamTip(streamId, viewer, amount);
+        emit Tipped(streamId, viewer, amount);
+    }
+
+    function tipVideo(bytes32 videoId, uint256 amount) external whenNotPaused {
+        address viewer = _msgSender();
+
+        _thurbeToken.transferFrom(viewer, address(this), amount);
+
+        Data.Video memory video = _videos[videoId];
+        require(video.tipId != bytes32(0), "No stream tip");
+
+        _tipProvider.tipStreamer(video.tipId, amount);
+
+        Data.Streamer storage streamerData = _streamers[video.streamer];
+        streamerData.totalUnClaimedThurbe += amount;
+
+        emit Tipped(videoId, viewer, amount);
     }
 
     function mintCard(
@@ -211,6 +253,24 @@ contract Thurbe is IThube, AccessControl, Pausable {
         _streams[streamId] = stream;
 
         emit StreamCreated(streamer, cardId);
+    }
+
+    function _startVideo(
+        bytes32 videoId,
+        address streamer,
+        address cardId
+    ) internal {
+        require(_streams[videoId].streamer == address(0));
+
+        Data.Video memory video = Data.Video({
+            streamer: streamer,
+            tipId: bytes32(0),
+            cardId: cardId
+        });
+
+        _videos[videoId] = video;
+
+        emit VideoCreated(streamer, cardId);
     }
 
     function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {

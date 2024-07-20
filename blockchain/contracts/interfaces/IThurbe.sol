@@ -5,11 +5,12 @@ interface IThube {
     event StreamPaused(bytes32 streamId);
     event StreamResumed(bytes32 streamId);
     event StreamEnded(bytes32 streamId);
-    event StreamTipCreated(bytes32 streamId, bytes32 tipId);
+    event TipCreated(bytes32 streamId, bytes32 tipId);
     event StreamTipClaimed(bytes32 streamId);
-    event StreamTip(bytes32 streamId, address viewer, uint256 amount);
+    event Tipped(bytes32 streamId, address viewer, uint256 amount);
     event StreamTipEnded(bytes32 streamId, bytes32 tipId);
     event StreamCreated(address streamer, address cardId);
+    event VideoCreated(address streamer, address cardId);
     event StreamerCreated(address streamer);
     event ClaimedThurbe(address streamer, uint256 amount);
     event ClaimedTfuel(address streamer, uint256 amount);
@@ -22,13 +23,14 @@ interface IThube {
         uint256 mintPrice,
         string memory baseURI
     ) external;
-    function startStream(bytes32 streamId, bool exclusive) external;
+    function startStream(bytes32 streamId, bool exclusive, bool tips) external;
+    function uploadVideo(bytes32 videoId, bool exclusive, bool tips) external;
     function endStream(bytes32 streamId) external;
-    function startTip(bytes32 streamId) external;
     function pauseTip(bytes32 streamId) external;
 
     // === Viewers Functions ===
     function tipStream(bytes32 streamId, uint256 amount) external;
+    function tipVideo(bytes32 videoId, uint256 amount) external;
     function mintCard(
         address streamer,
         address to,

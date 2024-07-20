@@ -67,7 +67,7 @@ export class AppController {
       (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
       dto.thumbnail,
-      dto.exclusive,
+      dto.viewerType,
       dto.playback_uri,
       dto.player_uri,
       dto.tips,
@@ -105,7 +105,7 @@ export class AppController {
       (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
       dto.thumbnail,
-      dto.exclusive,
+      dto.viewerType,
       dto.playback_uri,
       dto.tips
     );
