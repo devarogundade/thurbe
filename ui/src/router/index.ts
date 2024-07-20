@@ -16,6 +16,7 @@ import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';
 import GoLive from '@/views/create/GoLive.vue';
 import UploadVideo from '@/views/create/UploadVideo.vue';
 import CreateView from '@/views/create/CreateView.vue';
+import VideoDetail from '@/views/explore/details/VideoDetail.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,7 +52,12 @@ const router = createRouter({
               path: '/channels',
               name: 'explore-channels',
               component: ExploreChannels
-            }]
+            }],
+        },
+        {
+          path: '/videos/:id',
+          name: 'explore-videos-video',
+          component: VideoDetail
         },
         {
           path: '/portfolio',

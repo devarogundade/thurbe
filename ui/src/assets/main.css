@@ -30,8 +30,10 @@
 
     --tx-normal: rgba(22, 22, 24, 1);
     --tx-dimmed: rgba(171, 173, 174, 1);
+    --tx-semi: rgba(134, 138, 149, 1);
 
     --bg: rgba(255, 255, 255, 1);
     --bg-darkest: rgba(232, 232, 232, 1);
     --bg-dark: rgba(247, 247, 247, 1);
+    --bg-darker: rgba(240, 240, 240, 1);
 }

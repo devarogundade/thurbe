@@ -147,8 +147,7 @@ export class AppService {
         exclusive,
         created_at: new Date(),
         start_at,
-        viewers: [],
-        mailSent: false
+        viewers: []
       };
 
       const jobOptions: JobsOptions = {

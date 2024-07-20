@@ -20,12 +20,15 @@ section {
   max-width: calc(100% - 40px);
 }
 
+button {
+  cursor: pointer;
+}
+
 button:hover {
   transform: translateX(-3px);
   transform: translateY(-3px);
   box-shadow: 3px 3px var(--tx-dimmed);
 }
-
 
 .empty {
   display: flex;
@@ -43,4 +46,15 @@ button:hover {
 .empty img {
   height: 50px;
   filter: brightness(50%);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }
