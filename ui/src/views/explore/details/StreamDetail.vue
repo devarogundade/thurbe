@@ -532,7 +532,7 @@ onBeforeUnmount(() => {
                     </button>
                 </div>
                 <div class="restricted"
-                    v-else-if="stream.viewerType == ViewerType.Follower && !(isFollow || !isSuperFollow)">
+                    v-else-if="stream.viewerType == ViewerType.Follower && !(isFollow || isSuperFollow)">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by followers only, Click the
