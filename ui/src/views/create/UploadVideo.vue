@@ -19,9 +19,10 @@ import ThetaAPI from '@/scripts/theta-api';
 import ThurbeAPI from '@/scripts/thurbe-api';
 import Storage from '@/scripts/storage';
 import { useWalletStore } from '@/stores/wallet';
+import { useRouter } from 'vue-router';
 
 const walletStore = useWalletStore();
-
+const router = useRouter();
 const uploading = ref<boolean>(false);
 const activeTab = ref<number>(1);
 const video = ref<VideoForm>({
@@ -177,6 +178,8 @@ const uploadVideo = async () => {
             category: 'success'
         });
         uploading.value = false;
+
+        router.push('/portfolio');
     }, () => {
         notify.push({
             title: 'Error: Uploading video file',

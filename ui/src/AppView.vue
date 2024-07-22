@@ -48,7 +48,7 @@ onMounted(() => {
         }
 
         if ((walletType as unknown as WalletType) == WalletType.WalletConnect) {
-            // modal.open({ view: 'Connect' });
+            modal.open({ view: 'Connect' });
         }
 
         if ((walletType as unknown as WalletType) == WalletType.Metamask) {

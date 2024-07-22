@@ -21,10 +21,11 @@ import Storage from '@/scripts/storage';
 import { useWalletStore } from '@/stores/wallet';
 import GoLiveOption from '@/views/pops/GoLiveOption.vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
+import { useRouter } from 'vue-router';
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const walletStore = useWalletStore();
-
+const router = useRouter();
 const uploading = ref<boolean>(false);
 const activeTab = ref<number>(1);
 const stream = ref<StreamForm>({
@@ -168,6 +169,8 @@ const uploadVideo = async () => {
             category: 'success'
         });
         uploading.value = false;
+
+        router.push('/portfolio');
     }, () => {
         notify.push({
             title: 'Error: Uploading video file',
