@@ -424,6 +424,10 @@ const init = async () => {
         payable.value = isSuperFollow.value;
     }
 
+    if (stream.value?.streamer == walletStore.address) {
+        payable.value = true;
+    }
+
     videoUrl.value = await ThetaAPI.getStreamUrl(stream.value?.thetaId!);
 
     if (payable.value && videoPlayer.value && videoUrl.value && stream.value?.live) {
@@ -466,6 +470,11 @@ const closeConfigs = () => {
     refresh(false);
 };
 
+const isCreator = (): boolean => {
+    return (stream.value?.streamer as Account)?.address == walletStore.address?.toLocaleLowerCase();
+};
+
+
 const refresh = async (isInit: boolean = true) => {
     if (isInit) {
         init();
@@ -495,7 +504,7 @@ onBeforeUnmount(() => {
         player.dispose();
     }
 
-    if (payable.value) {
+    if (!isCreator() && payable.value) {
         ThurbeAPI.joinStream(
             walletStore.address || 'undefined',
             stream.value?.streamId!
@@ -521,7 +530,8 @@ onBeforeUnmount(() => {
                         <p>Refresh</p>
                     </button>
                 </div>
-                <div class="restricted" v-else-if="stream.viewerType == ViewerType.SuperFollower && !isSuperFollow">
+                <div class="restricted"
+                    v-else-if="!isCreator() && stream.viewerType == ViewerType.SuperFollower && !isSuperFollow">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by Super followers only, Click the
@@ -532,7 +542,7 @@ onBeforeUnmount(() => {
                     </button>
                 </div>
                 <div class="restricted"
-                    v-else-if="stream.viewerType == ViewerType.Follower && !(isFollow || isSuperFollow)">
+                    v-else-if="!isCreator() && stream.viewerType == ViewerType.Follower && !(isFollow || isSuperFollow)">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by followers only, Click the
@@ -548,8 +558,7 @@ onBeforeUnmount(() => {
                 </video>
             </div>
 
-            <div class="video_info control_panel"
-                v-if="(walletStore.address?.toLocaleLowerCase() || '') == (stream.streamer as Account).address">
+            <div class="video_info control_panel" v-if="isCreator()">
                 <div class="video_title">
                     <h3>{{ stream.name }}</h3>
                     <p>{{ formatDate(stream.created_at) }}</p>
@@ -633,7 +642,7 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
 
-                <div class="creator_follows">
+                <div class="creator_follows" v-if="!isCreator()">
                     <button v-if="isSuperFollow" class="creator_follow_super">
                         <div class="creator_follow_icon">
                             <FlashIcon :color="'var(--tx-normal)'" />

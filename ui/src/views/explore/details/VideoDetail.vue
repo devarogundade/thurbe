@@ -300,6 +300,10 @@ const init = async () => {
         payable.value = isSuperFollow.value;
     }
 
+    if (isCreator()) {
+        payable.value = true;
+    }
+
     videoUrl.value = await ThetaAPI.getVideoUrl(video.value?.thetaId!);
 
     if (payable.value && videoPlayer.value && videoUrl.value) {
@@ -339,6 +343,10 @@ const init = async () => {
     }
 };
 
+const isCreator = (): boolean => {
+    return (video.value?.streamer as Account)?.address == walletStore.address?.toLocaleLowerCase();
+};
+
 const refresh = async (isInit: boolean = true) => {
     if (isInit) {
         init();
@@ -359,7 +367,7 @@ onBeforeUnmount(() => {
         player.dispose();
     }
 
-    if (payable.value) {
+    if (!isCreator() && payable.value) {
         ThurbeAPI.watchVideo(
             walletStore.address || 'undefined',
             video.value?.videoId!
@@ -384,7 +392,8 @@ onBeforeUnmount(() => {
                         <p>Refresh</p>
                     </button>
                 </div>
-                <div class="restricted" v-else-if="video.viewerType == ViewerType.SuperFollower && !isSuperFollow">
+                <div class="restricted"
+                    v-else-if="!isCreator() && video.viewerType == ViewerType.SuperFollower && !isSuperFollow">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by Super followers only, Click the
@@ -395,7 +404,7 @@ onBeforeUnmount(() => {
                     </button>
                 </div>
                 <div class="restricted"
-                    v-else-if="video.viewerType == ViewerType.Follower && !(isFollow || isSuperFollow)">
+                    v-else-if="!isCreator() && video.viewerType == ViewerType.Follower && !(isFollow || isSuperFollow)">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by followers only, Click the
@@ -440,7 +449,7 @@ onBeforeUnmount(() => {
                     </div>
                 </div>
 
-                <div class="creator_follow">
+                <div class="creator_follow" v-if="!isCreator()">
                     <button v-if="isSuperFollow" class="creator_follow_super">
                         <div class="creator_follow_icon">
                             <FlashIcon :color="'var(--tx-normal)'" />
