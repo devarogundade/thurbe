@@ -303,6 +303,15 @@ const dislike = async () => {
 };
 
 const react = async (emoji: string) => {
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
     socketAPI.emit('reaction', {
         channelId: stream.value?.streamId!,
         emoji
