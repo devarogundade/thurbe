@@ -145,6 +145,15 @@ const setTip = (amount: number) => {
 const text = ref<undefined | string>(undefined);
 
 const sendComment = async () => {
+    if (!payable.value) {
+        notify.push({
+            title: 'Error: Cant send comment',
+            description: 'This content is exclusive to followers or super followers',
+            category: 'error'
+        });
+        return;
+    }
+
     if (commenting.value) return;
 
     if (!walletStore.address) {

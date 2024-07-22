@@ -158,6 +158,15 @@ const setTip = (amount: number) => {
 const text = ref<undefined | string>(undefined);
 
 const sendComment = async () => {
+    if (!payable.value) {
+        notify.push({
+            title: 'Error: Cant send chat',
+            description: 'This content is exclusive to followers or super followers',
+            category: 'error'
+        });
+        return;
+    }
+
     if (!stream.value?.live) {
         notify.push({
             title: 'Error: Stream is not live',
