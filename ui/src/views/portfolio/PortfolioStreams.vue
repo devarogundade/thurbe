@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
 import ProgressBox from '@/components/ProgressBox.vue';
+import PlayCircleIcon from '@/components/icons/PlayCircleIcon.vue';
 import { type Stream, type Account } from "@/types";
 import { onMounted, ref } from "vue";
 // @ts-ignore
@@ -38,7 +39,9 @@ onMounted(() => {
             <div class="stream">
                 <div class="thumbnail">
                     <img :src="stream.thumbnail" alt="">
-                    <div class="play_button"></div>
+                    <div class="play_button">
+                        <PlayCircleIcon />
+                    </div>
                     <p class="live" v-show="stream.live">Live</p>
                 </div>
                 <div class="detail">

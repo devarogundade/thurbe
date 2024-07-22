@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
 import ProgressBox from '@/components/ProgressBox.vue';
+import PlayCircleIcon from '@/components/icons/PlayCircleIcon.vue';
 import { type Video, type Account } from "@/types";
 import { onMounted, ref } from "vue";
 // @ts-ignore
@@ -37,7 +38,9 @@ onMounted(() => {
             <div class="video">
                 <div class="thumbnail">
                     <img :src="video.thumbnail" alt="">
-                    <div class="play_button"></div>
+                    <div class="play_button">
+                        <PlayCircleIcon />
+                    </div>
                 </div>
                 <div class="detail">
                     <div class="detail_content">
