@@ -194,3 +194,11 @@ export type Chat = {
     },
     timestamp: Date;
 };
+
+export type Revenue = {
+    createdAt: bigint;
+    totalClaimedTfuel: bigint;
+    totalClaimedThurbe: bigint;
+    totalUnClaimedTfuel: bigint;
+    totalUnClaimedThurbe: bigint;
+};

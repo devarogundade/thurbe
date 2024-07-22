@@ -9,10 +9,41 @@ import { useWalletStore } from '@/stores/wallet';
 import { useRoute } from 'vue-router';
 import { type Account } from '@/types';
 import Converter from '@/scripts/converter';
+import Contract from '@/scripts/contract';
+import { ref } from "vue";
+import { notify } from '@/reactives/notify';
 
 const walletStore = useWalletStore();
 
 const route = useRoute();
+const claimingAll = ref<boolean>(false);
+
+const emit = defineEmits(['refresh']);
+
+const claimAll = async () => {
+    if (claimingAll.value) return;
+
+    claimingAll.value = true;
+
+    const txHash = await Contract.claimAll();
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Revenue claimed',
+            description: 'Transaction sent',
+            category: 'success'
+        });
+    } else {
+        notify.push({
+            title: 'Error: Interracting with theta api',
+            description: 'Please try again',
+            category: 'error'
+        });
+    }
+    claimingAll.value = false;
+
+    emit('refresh');
+};
 </script>
 
 <template>
@@ -83,9 +114,9 @@ const route = useRoute();
                     </div>
                 </RouterLink>
 
-                <div class="filter" v-if="route.name == 'portfolio-revenue'">
+                <div class="filter" @click="claimAll" v-if="route.name == 'portfolio-revenue'">
                     <CoinIcon />
-                    <p>Claim All</p>
+                    <p>{{ claimingAll ? 'Claiming...' : 'Claim All' }}</p>
                 </div>
             </div>
         </div>

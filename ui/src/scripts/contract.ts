@@ -1,6 +1,7 @@
 import { config } from './config';
 import { abi as thurbeAbi, cardAbi } from '../abis/thurbe';
 import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
+import type { Revenue } from '@/types';
 
 export const thurbeId: `0x${string}` = '0xD21126168F885D179149679b7Cf3E78dC0C530A0';
 export const thurbeTokenId: `0x${string}` = '0xbC91a7FF276DCa355124E924E1994F1E11A53ec8';
@@ -204,9 +205,62 @@ const Contract = {
         }
     },
 
+    async claimTfuel(amount: bigint): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'claimTfuel',
+                args: [amount]
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async claimThurbe(amount: bigint): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'claimThurbe',
+                args: [amount]
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async claimAll(): Promise<`0x${string}` | null> {
+        try {
+            const result = await writeContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'claimAll'
+            });
+
+            const receipt = await waitForTransactionReceipt(config, { hash: result });
+
+            return receipt.transactionHash;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
     async getStreamer(
         streamer: `0x${string}`,
-    ): Promise<`0x${string}` | null> {
+    ): Promise<Revenue | null> {
         try {
             // @ts-ignore
             return await readContract(config, {

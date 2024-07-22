@@ -1,27 +1,127 @@
 <script setup lang="ts">
 import CoinsIcon from '@/components/icons/CoinsIcon.vue';
+import { notify } from '@/reactives/notify';
+import { useWalletStore } from '@/stores/wallet';
+import ProgressBox from '@/components/ProgressBox.vue';
+import { onMounted, ref } from "vue";
+import Contract from '@/scripts/contract';
+import Converter from '@/scripts/converter';
+import { type Revenue } from '@/types';
+
+const revenue = ref<Revenue | null>(null);
+const walletStore = useWalletStore();
+const loading = ref<boolean>(true);
+const claimingTfuel = ref<boolean>(false);
+const claimingThurbe = ref<boolean>(false);
+
+const getRatio = (a: any, b: any) => {
+    if (Number(a) == 0) return 0;
+    return Number((Number(a) / Number(a) + Number(b)) * 100).toFixed(0);
+};
+
+const sum = (a: any, b: any) => {
+    return Number(a) + Number(b);
+};
+
+const getRevenue = async (load: boolean = true) => {
+    loading.value = load;
+    revenue.value = await Contract.getStreamer(walletStore.address!);
+    loading.value = false;
+};
+
+const claimTfuel = async () => {
+    if (claimingTfuel.value) return;
+    if (revenue.value?.totalUnClaimedTfuel == BigInt(0)) {
+        return;
+    }
+    claimingTfuel.value = true;
+
+    const txHash = await Contract.claimTfuel(revenue.value?.totalUnClaimedTfuel || BigInt(0));
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Revenue claimed',
+            description: 'Transaction sent',
+            category: 'success'
+        });
+    } else {
+        notify.push({
+            title: 'Error: Interracting with theta api',
+            description: 'Please try again',
+            category: 'error'
+        });
+    }
+    claimingTfuel.value = false;
+
+    getRevenue(false);
+};
+
+const claimThurbe = async () => {
+    if (claimingThurbe.value) return;
+    if (revenue.value?.totalUnClaimedThurbe == BigInt(0)) {
+        return;
+    }
+
+    claimingThurbe.value = true;
+
+    const txHash = await Contract.claimThurbe(revenue.value?.totalUnClaimedThurbe || BigInt(0));
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Revenue claimed',
+            description: 'Transaction sent',
+            category: 'success'
+        });
+    } else {
+        notify.push({
+            title: 'Error: Interracting with theta api',
+            description: 'Please try again',
+            category: 'error'
+        });
+    }
+    claimingThurbe.value = false;
+
+    getRevenue(false);
+};
+
+onMounted(() => {
+    getRevenue();
+});
 </script>
 
 <template>
-    <div class="revenue_container">
+    <div class="load_frame" v-if="loading">
+        <ProgressBox />
+    </div>
+
+    <div class="revenue_container" v-if="!loading && revenue">
         <div class="revenue">
             <div class="revenue_title">
-                <p>Total Videos Revenue</p>
-                <h3>$0,00</h3>
+                <p>Total Videos & Streams Revenue</p>
+                <h3>{{ sum(Converter.toMoney(Converter.fromWei(revenue.totalClaimedTfuel)),
+                    Converter.fromWei(revenue.totalUnClaimedTfuel)) }} TFUEL</h3>
             </div>
             <div class="revenue_amounts">
                 <div class="revenue_amount">
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
                             <img src="/images/tfuel.png" alt="theta">
-                            <p><span>0,00</span> TFUEL ~ $0,00</p>
+                            <p><span>{{ Converter.toMoney(Converter.fromWei(revenue.totalUnClaimedTfuel)) }}</span>
+                                TFUEL ~ $0,00</p>
                         </div>
 
-                        <div class="revenue_amount_percent">60%</div>
+                        <div class="revenue_amount_percent">{{
+                            getRatio(Converter.fromWei(revenue.totalUnClaimedTfuel),
+                                Converter.fromWei(revenue.totalClaimedTfuel))
+                        }}%</div>
                     </div>
                     <div class="revenue_amount_progress">
-                        <div class="revenue_amount_bar"></div>
-                        <div class="revenue_amount_bar_dot"></div>
+                        <div class="revenue_amount_bar"
+                            :style="`width: ${getRatio(Converter.fromWei(revenue.totalUnClaimedTfuel), Converter.fromWei(revenue.totalClaimedTfuel))}%;`">
+                        </div>
+                        <div class="revenue_amount_bar_dot"
+                            :style="`left: ${getRatio(Converter.fromWei(revenue.totalUnClaimedTfuel), Converter.fromWei(revenue.totalClaimedTfuel))}%;`">
+                        </div>
                     </div>
                 </div>
 
@@ -29,14 +129,22 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
                             <img src="/images/tfuel.png" alt="theta">
-                            <p><span>12,451</span> TFUEL ~ $0,00</p>
+                            <p><span>{{ Converter.toMoney(Converter.fromWei(revenue.totalClaimedTfuel)) }}</span> TFUEL
+                                ~ $0,00</p>
                         </div>
 
-                        <div class="revenue_amount_percent">60%</div>
+                        <div class="revenue_amount_percent">{{
+                            getRatio(Converter.fromWei(revenue.totalClaimedTfuel),
+                                Converter.fromWei(revenue.totalUnClaimedTfuel))
+                        }}%</div>
                     </div>
                     <div class="revenue_amount_progress">
-                        <div class="revenue_amount_bar"></div>
-                        <div class="revenue_amount_bar_dot"></div>
+                        <div class="revenue_amount_bar"
+                            :style="`width: ${getRatio(Converter.fromWei(revenue.totalClaimedTfuel), Converter.fromWei(revenue.totalUnClaimedTfuel))}%;`">
+                        </div>
+                        <div class="revenue_amount_bar_dot"
+                            :style="`left: ${getRatio(Converter.fromWei(revenue.totalClaimedTfuel), Converter.fromWei(revenue.totalUnClaimedTfuel))}%;`">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,30 +160,39 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     </div>
                 </div>
 
-                <button class="revenue_claim_btn">
-                    <CoinsIcon /> Claim
+                <button class="revenue_claim_btn" @click="claimTfuel">
+                    <CoinsIcon /> {{ claimingTfuel ? 'Claiming...' : 'Claim' }}
                 </button>
             </div>
         </div>
 
         <div class="revenue">
             <div class="revenue_title">
-                <p>Total Streams Revenue</p>
-                <h3>$0,00</h3>
+                <p>Total Tips Revenue</p>
+                <h3>{{ sum(Converter.toMoney(Converter.fromWei(revenue.totalClaimedThurbe)),
+                    Converter.fromWei(revenue.totalUnClaimedThurbe)) }} THUBE</h3>
             </div>
             <div class="revenue_amounts">
                 <div class="revenue_amount">
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
                             <img src="/images/logo.png" alt="theta">
-                            <p><span>12,451</span> THUBE ~ $0,00</p>
+                            <p><span>{{ Converter.toMoney(Converter.fromWei(revenue.totalUnClaimedThurbe)) }}</span>
+                                THUBE ~ $0,00</p>
                         </div>
 
-                        <div class="revenue_amount_percent">60%</div>
+                        <div class="revenue_amount_percent">{{
+                            getRatio(Converter.fromWei(revenue.totalUnClaimedThurbe),
+                                Converter.fromWei(revenue.totalClaimedThurbe))
+                        }}%</div>
                     </div>
                     <div class="revenue_amount_progress">
-                        <div class="revenue_amount_bar"></div>
-                        <div class="revenue_amount_bar_dot"></div>
+                        <div class="revenue_amount_bar"
+                            :style="`width: ${getRatio(Converter.fromWei(revenue.totalUnClaimedThurbe), Converter.fromWei(revenue.totalClaimedThurbe))}%;`">
+                        </div>
+                        <div class="revenue_amount_bar_dot"
+                            :style="`left: ${getRatio(Converter.fromWei(revenue.totalUnClaimedThurbe), Converter.fromWei(revenue.totalClaimedThurbe))}%;`">
+                        </div>
                     </div>
                 </div>
 
@@ -83,14 +200,21 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
                             <img src="/images/logo.png" alt="theta">
-                            <p><span>12,451</span> THUBE ~ $0,00</p>
+                            <p><span>{{ Converter.toMoney(Converter.fromWei(revenue.totalClaimedThurbe)) }}</span> THUBE
+                                ~ $0,00</p>
                         </div>
 
-                        <div class="revenue_amount_percent">60%</div>
+                        <div class="revenue_amount_percent">{{
+                            getRatio(Converter.fromWei(revenue.totalClaimedThurbe),
+                                Converter.fromWei(revenue.totalUnClaimedThurbe)) }}%</div>
                     </div>
                     <div class="revenue_amount_progress">
-                        <div class="revenue_amount_bar"></div>
-                        <div class="revenue_amount_bar_dot"></div>
+                        <div class="revenue_amount_bar"
+                            :style="`width: ${getRatio(Converter.fromWei(revenue.totalClaimedThurbe), Converter.fromWei(revenue.totalUnClaimedThurbe))}%;`">
+                        </div>
+                        <div class="revenue_amount_bar_dot"
+                            :style="`left: ${getRatio(Converter.fromWei(revenue.totalClaimedThurbe), Converter.fromWei(revenue.totalUnClaimedThurbe))}%;`">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -102,12 +226,12 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                             <img src="/images/logo.png" alt="">
                             <img src="/images/logo.png" alt="">
                         </div>
-                        <p>~ $14,215</p>
+                        <p>~ $0,00</p>
                     </div>
                 </div>
 
-                <button class="revenue_claim_btn">
-                    <CoinsIcon /> Claim
+                <button class="revenue_claim_btn" @click="claimThurbe">
+                    <CoinsIcon /> {{ claimingThurbe ? 'Claiming...' : 'Claim' }}
                 </button>
             </div>
         </div>
@@ -207,7 +331,6 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
     height: 100%;
     border-radius: 2px;
     background: var(--primary-light);
-    width: 60%;
 }
 
 .revenue_amount_bar_dot {
@@ -217,7 +340,6 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
     background: var(--primary-light);
     border: 4px solid var(--primary);
     position: absolute;
-    left: 60%;
     top: 50%;
     transform: translate(0, -50%);
 }
