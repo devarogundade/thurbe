@@ -104,26 +104,6 @@ contract Thurbe is IThube, AccessControl, Pausable {
         }
     }
 
-    function endStream(bytes32 streamId) external whenNotPaused {
-        address streamer = _msgSender();
-
-        Data.Stream storage stream = _streams[streamId];
-        require(stream.streamer == streamer, "Not owner");
-        require(stream.ongoing, "Stream is not ongoing.");
-        require(!stream.ended, "Stream has already ended.");
-
-        if (
-            stream.tipId != bytes32(0) && !_tipProvider.isPaused(stream.tipId)
-        ) {
-            _tipProvider.pause(streamer, stream.tipId);
-        }
-
-        stream.ongoing = false;
-        stream.ended = true;
-
-        emit StreamEnded(streamId);
-    }
-
     function _startTip(bytes32 id) internal returns (bytes32) {
         address streamer = _msgSender();
 
@@ -144,7 +124,21 @@ contract Thurbe is IThube, AccessControl, Pausable {
         emit StreamPaused(streamId);
     }
 
-    function claimTips(uint256 amount) external whenNotPaused {
+    function claimTfuel(uint256 amount) public override whenNotPaused {
+        address streamer = _msgSender();
+
+        Data.Streamer storage streamerData = _streamers[streamer];
+        require(streamerData.totalUnClaimedTfuel >= amount, "Insufficient");
+
+        payable(streamer).transfer(amount);
+
+        streamerData.totalUnClaimedTfuel -= amount;
+        streamerData.totalClaimedTfuel += amount;
+
+        emit ClaimedTfuel(streamer, amount);
+    }
+
+    function claimThurbe(uint256 amount) public override whenNotPaused {
         address streamer = _msgSender();
 
         Data.Streamer storage streamerData = _streamers[streamer];
@@ -158,18 +152,13 @@ contract Thurbe is IThube, AccessControl, Pausable {
         emit ClaimedThurbe(streamer, amount);
     }
 
-    function claimEarnigs(uint256 amount) external whenNotPaused {
+    function claimAll() external override {
         address streamer = _msgSender();
 
         Data.Streamer storage streamerData = _streamers[streamer];
-        require(streamerData.totalUnClaimedTfuel >= amount, "Insufficient");
 
-        payable(streamer).transfer(amount);
-
-        streamerData.totalUnClaimedTfuel -= amount;
-        streamerData.totalClaimedTfuel += amount;
-
-        emit ClaimedTfuel(streamer, amount);
+        claimTfuel(streamerData.totalUnClaimedTfuel);
+        claimThurbe(streamerData.totalUnClaimedThurbe);
     }
 
     // === Viewers Functions ===
@@ -249,9 +238,7 @@ contract Thurbe is IThube, AccessControl, Pausable {
         Data.Stream memory stream = Data.Stream({
             streamer: streamer,
             tipId: bytes32(0),
-            cardId: cardId,
-            ongoing: false,
-            ended: false
+            cardId: cardId
         });
 
         _streams[streamId] = stream;
@@ -283,5 +270,23 @@ contract Thurbe is IThube, AccessControl, Pausable {
 
     function unPause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
+    }
+
+    function getStreamer(
+        address streamer
+    ) external view override returns (Data.Streamer memory) {
+        return _streamers[streamer];
+    }
+
+    function getStream(
+        bytes32 streamId
+    ) external view override returns (Data.Stream memory) {
+        return _streams[streamId];
+    }
+
+    function getVideo(
+        bytes32 videoId
+    ) external view override returns (Data.Video memory) {
+        return _videos[videoId];
     }
 }

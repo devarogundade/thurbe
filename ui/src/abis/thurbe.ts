@@ -360,14 +360,8 @@ export const abi = [
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "claimEarnigs",
+        "inputs": [],
+        "name": "claimAll",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -380,7 +374,20 @@ export const abi = [
                 "type": "uint256"
             }
         ],
-        "name": "claimTips",
+        "name": "claimTfuel",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "claimThurbe",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -414,19 +421,6 @@ export const abi = [
             }
         ],
         "name": "create",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32",
-                "name": "streamId",
-                "type": "bytes32"
-            }
-        ],
-        "name": "endStream",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -469,6 +463,124 @@ export const abi = [
                 "internalType": "bytes32",
                 "name": "",
                 "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "streamId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getStream",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "streamer",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "tipId",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "cardId",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Data.Stream",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "streamer",
+                "type": "address"
+            }
+        ],
+        "name": "getStreamer",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "totalUnClaimedTfuel",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalClaimedTfuel",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalUnClaimedThurbe",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "totalClaimedThurbe",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "createdAt",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct Data.Streamer",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "videoId",
+                "type": "bytes32"
+            }
+        ],
+        "name": "getVideo",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "streamer",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bytes32",
+                        "name": "tipId",
+                        "type": "bytes32"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "cardId",
+                        "type": "address"
+                    }
+                ],
+                "internalType": "struct Data.Video",
+                "name": "",
+                "type": "tuple"
             }
         ],
         "stateMutability": "view",
@@ -717,7 +829,6 @@ export const abi = [
         "type": "function"
     }
 ];
-
 
 export const cardAbi = [
     {

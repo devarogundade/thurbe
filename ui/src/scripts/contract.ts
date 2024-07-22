@@ -2,8 +2,8 @@ import { config } from './config';
 import { abi as thurbeAbi, cardAbi } from '../abis/thurbe';
 import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 
-export const thurbeId: `0x${string}` = '0xB228793E1C1CBF71FbBccc55adAD4E1486c8762B';
-export const thurbeTokenId: `0x${string}` = '0xA8EE5d96C6005BA0Db924bf0518b1F4564428e55';
+export const thurbeId: `0x${string}` = '0xD21126168F885D179149679b7Cf3E78dC0C530A0';
+export const thurbeTokenId: `0x${string}` = '0xbC91a7FF276DCa355124E924E1994F1E11A53ec8';
 
 const Contract = {
     // === Streamer Functions ===
