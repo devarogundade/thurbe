@@ -23,11 +23,11 @@ const props = defineProps({
     channel: { type: Object, required: true },
     isSuperFollow: { type: Boolean },
     isFollow: { type: Boolean },
+    superFollowAmount: { required: true }
 });
 
 const super_follow = ref({
     open: false,
-    amount: BigInt(0),
     loading: false
 });
 
@@ -78,7 +78,8 @@ const superFollow = async () => {
         props.channel.owner.address as `0x${string}`,
         walletStore.address,
         true,
-        super_follow.value.amount
+        // @ts-ignore
+        props.superFollowAmount
     );
 
     super_follow.value.open = false;
@@ -170,7 +171,7 @@ const superFollow = async () => {
             </div>
         </div>
 
-        <SuperFollow :channel="props.channel" :amount="super_follow.amount" v-if="super_follow.open"
+        <SuperFollow :channel="props.channel" :amount="props.superFollowAmount" v-if="super_follow.open"
             @close="super_follow.open = false" @continue="superFollow" />
     </div>
 </template>

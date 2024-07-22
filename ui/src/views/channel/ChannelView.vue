@@ -15,6 +15,7 @@ const channel = ref<Channel | null>(null);
 const isFollow = ref<boolean>(false);
 const isSuperFollow = ref<boolean>(false);
 const walletStore = useWalletStore();
+const superFollowAmount = ref(BigInt(0));
 
 const getChannel = async () => {
     loading.value = true;
@@ -47,6 +48,10 @@ const getFollows = async () => {
             isSuperFollow.value = cardBalance > 0;
         }
     }
+
+    if (exclusiveCardId) {
+        superFollowAmount.value = await Contract.getMintPrice(exclusiveCardId);
+    }
 };
 
 onMounted(() => {
@@ -60,7 +65,8 @@ onMounted(() => {
     </div>
 
     <main v-else-if="!loading && channel">
-        <ChannelHeader @refresh="getFollows" :channel="channel" :isFollow="isFollow" :isSuperFollow="isSuperFollow" />
+        <ChannelHeader @refresh="getFollows" :superFollowAmount="superFollowAmount" :channel="channel"
+            :isFollow="isFollow" :isSuperFollow="isSuperFollow" />
         <RouterView />
     </main>
 </template>
