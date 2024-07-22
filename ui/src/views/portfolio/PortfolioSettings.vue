@@ -53,10 +53,11 @@ const selectImage = (event: any) => {
 };
 
 const updateChannel = async () => {
-    if (existingChannel) {
+    if (Boolean(existingChannel) && Boolean(existingChannel?.value?.name)) {
         router.push('/portfolio');
         return;
     }
+
     if (updating.value) return;
 
     if (!walletStore.address) {
