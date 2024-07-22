@@ -85,68 +85,82 @@ const getStream = async () => {
 };
 
 const follow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    const txHash = await Contract.mintCard(
+        (stream.value?.streamer as Account).address as `0x${string}`,
+        walletStore.address,
+        false,
+        BigInt(0)
+    );
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Followed ' + (stream.value?.streamer as Account).channel?.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             (stream.value?.streamer as Account).address as `0x${string}`,
-            walletStore.address,
-            false,
-            BigInt(0)
+            walletStore.address
         );
 
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Followed ' + (stream.value?.streamer as Account).channel?.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                (stream.value?.streamer as Account).address as `0x${string}`,
-                walletStore.address
-            );
-
-            refresh();
-        } else {
-            notify.push({
-                title: 'Error: Interracting with smart contracts',
-                description: 'Please try again',
-                category: 'error'
-            });
-        }
+        refresh();
+    } else {
+        notify.push({
+            title: 'Error: Interracting with smart contracts',
+            description: 'Please try again',
+            category: 'error'
+        });
     }
 };
 
 const superFollow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    const txHash = await Contract.mintCard(
+        (stream.value?.streamer as Account).address as `0x${string}`,
+        walletStore.address,
+        true,
+        super_follow.value.amount
+    );
+
+    super_follow.value.open = false;
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Super followed ' + (stream.value?.streamer as Account).channel?.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             (stream.value?.streamer as Account).address as `0x${string}`,
-            walletStore.address,
-            true,
-            super_follow.value.amount
+            walletStore.address
         );
 
-        super_follow.value.open = false;
-
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Super followed ' + (stream.value?.streamer as Account).channel?.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                (stream.value?.streamer as Account).address as `0x${string}`,
-                walletStore.address
-            );
-
-            refresh();
-        } else {
-            notify.push({
-                title: 'Error: Interracting with smart contracts',
-                description: 'Please try again',
-                category: 'error'
-            });
-        }
+        refresh();
+    } else {
+        notify.push({
+            title: 'Error: Interracting with smart contracts',
+            description: 'Please try again',
+            category: 'error'
+        });
     }
 };
 

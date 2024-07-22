@@ -32,57 +32,70 @@ const super_follow = ref({
 });
 
 const follow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    const txHash = await Contract.mintCard(
+        props.channel.owner.address as `0x${string}`,
+        walletStore.address,
+        false,
+        BigInt(0)
+    );
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Followed ' + props.channel.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             props.channel.owner.address as `0x${string}`,
-            walletStore.address,
-            false,
-            BigInt(0)
+            walletStore.address
         );
 
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Followed ' + props.channel.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                props.channel.owner.address as `0x${string}`,
-                walletStore.address
-            );
-
-            emit('refresh');
-        }
+        emit('refresh');
     }
 };
 
 const superFollow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    const txHash = await Contract.mintCard(
+        props.channel.owner.address as `0x${string}`,
+        walletStore.address,
+        true,
+        super_follow.value.amount
+    );
+
+    super_follow.value.open = false;
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Super followed ' + props.channel?.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             props.channel.owner.address as `0x${string}`,
-            walletStore.address,
-            true,
-            super_follow.value.amount
+            walletStore.address
         );
 
-        super_follow.value.open = false;
-
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Super followed ' + props.channel?.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                props.channel.owner.address as `0x${string}`,
-                walletStore.address
-            );
-
-            emit('refresh');
-        }
-
+        emit('refresh');
     }
 };
 </script>

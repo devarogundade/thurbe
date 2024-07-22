@@ -20,6 +20,12 @@ const getChannel = async () => {
     loading.value = true;
     channel.value = await ThurbeAPI.getChannel(route.params.id as any);
 
+    getFollows();
+
+    loading.value = false;
+};
+
+const getFollows = async () => {
     const cardId = await Contract.getCardId(
         (route.params.id as any) as `0x${string}`,
         false
@@ -29,7 +35,6 @@ const getChannel = async () => {
         (route.params.id as any) as `0x${string}`,
         true
     );
-
 
     if (walletStore.address) {
         if (cardId) {
@@ -42,7 +47,6 @@ const getChannel = async () => {
             isSuperFollow.value = cardBalance > 0;
         }
     }
-    loading.value = false;
 };
 
 onMounted(() => {
@@ -56,7 +60,7 @@ onMounted(() => {
     </div>
 
     <main v-else-if="!loading && channel">
-        <ChannelHeader :channel="channel" :isFollow="isFollow" :isSuperFollow="isSuperFollow" />
+        <ChannelHeader @refresh="getFollows" :channel="channel" :isFollow="isFollow" :isSuperFollow="isSuperFollow" />
         <RouterView />
     </main>
 </template>
