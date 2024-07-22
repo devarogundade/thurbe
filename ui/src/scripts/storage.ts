@@ -30,6 +30,21 @@ const Storage = {
                 onSuccess(url);
             }
         );
+    },
+
+    awaitUpload(file: File, name: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            this.upload(
+                file,
+                name,
+                (url: string) => {
+                    resolve(url);
+                },
+                (error: Error) => {
+                    reject(error);
+                }
+            );
+        });
     }
 };
 

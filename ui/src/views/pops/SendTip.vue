@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import CoinsDollarIcon from '@/components/icons/CoinsDollarIcon.vue';
+import { ref } from "vue";
 
 const emit = defineEmits(['close', 'continue']);
 
+const amount = ref<undefined | number>(undefined);
 const props = defineProps({
-    account: { type: Object, required: true }
+    channel: { type: Object, required: true }
 });
 </script>
 
@@ -25,17 +27,17 @@ const props = defineProps({
 
             <div class="amount">
                 <img src="/images/logo.png" alt="">
-                <h3><input type="number" placeholder="0.00"> THUB</h3>
+                <h3><input type="number" placeholder="0.00" v-model="amount"> THUB</h3>
                 <p>~$0.00</p>
             </div>
 
             <div class="creator">
                 <img src="/images/game.png" alt="">
-                <h3>The CartoonistGuy</h3>
+                <h3>{{ props.channel.name }}</h3>
             </div>
 
             <div class="pay">
-                <button>Make Payment</button>
+                <button @click="emit('continue', amount?.valueOf())">Confirm</button>
             </div>
         </div>
     </div>

@@ -23,7 +23,7 @@ const Converter = {
         }
     },
 
-    fromWei: function (wei: string) {
+    fromWei: function (wei: any) {
         try {
             if (wei == '' || wei == '0') return '0';
             return convert(wei, 'wei', 'ether');
@@ -32,7 +32,8 @@ const Converter = {
             return '0';
         }
     },
-    toWei: function (ether: string) {
+
+    toWei: function (ether: any) {
         try {
             if (ether == '') return '0';
             return convert(ether, 'ether', 'wei');
@@ -41,6 +42,7 @@ const Converter = {
             return '0';
         }
     },
+
     toMoney: function (amount: number, max = null) {
         let maxF = max ? max : 6;
         if (amount > 1) {
@@ -60,6 +62,12 @@ const Converter = {
         });
         return formatter.format(amount).replace('$', '');
     },
+
+    fullMonth: function (date: Date): string {
+        const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long' };
+        return date.toLocaleString('en-US', options);
+    },
+
     nFormatter: function (num: number, digits: number) {
         if (num < 1000) return this.toMoney(num);
         const lookup = [

@@ -7,14 +7,14 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
         <div class="revenue">
             <div class="revenue_title">
                 <p>Total Videos Revenue</p>
-                <h3>$125,582</h3>
+                <h3>$0,00</h3>
             </div>
             <div class="revenue_amounts">
                 <div class="revenue_amount">
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
-                            <img src="/images/theta.png" alt="theta">
-                            <p><span>12,451</span> THETA ~ $99,456</p>
+                            <img src="/images/tfuel.png" alt="theta">
+                            <p><span>0,00</span> TFUEL ~ $0,00</p>
                         </div>
 
                         <div class="revenue_amount_percent">60%</div>
@@ -29,7 +29,7 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
                             <img src="/images/tfuel.png" alt="theta">
-                            <p><span>12,451</span> THETA ~ $99,456</p>
+                            <p><span>12,451</span> TFUEL ~ $0,00</p>
                         </div>
 
                         <div class="revenue_amount_percent">60%</div>
@@ -45,10 +45,10 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     <p>Unclaimed Revenue</p>
                     <div class="revenue_claim_balance">
                         <div class="revenue_claim_balance_images">
-                            <img src="/images/theta.png" alt="">
+                            <img src="/images/tfuel.png" alt="">
                             <img src="/images/tfuel.png" alt="">
                         </div>
-                        <p>~ $14,215</p>
+                        <p>~ $0,00</p>
                     </div>
                 </div>
 
@@ -61,14 +61,14 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
         <div class="revenue">
             <div class="revenue_title">
                 <p>Total Streams Revenue</p>
-                <h3>$125,582</h3>
+                <h3>$0,00</h3>
             </div>
             <div class="revenue_amounts">
                 <div class="revenue_amount">
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
-                            <img src="/images/theta.png" alt="theta">
-                            <p><span>12,451</span> THETA ~ $99,456</p>
+                            <img src="/images/logo.png" alt="theta">
+                            <p><span>12,451</span> THUBE ~ $0,00</p>
                         </div>
 
                         <div class="revenue_amount_percent">60%</div>
@@ -82,8 +82,8 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                 <div class="revenue_amount">
                     <div class="revenue_amount_name">
                         <div class="revenue_amount_name_text">
-                            <img src="/images/tfuel.png" alt="theta">
-                            <p><span>12,451</span> THETA ~ $99,456</p>
+                            <img src="/images/logo.png" alt="theta">
+                            <p><span>12,451</span> THUBE ~ $0,00</p>
                         </div>
 
                         <div class="revenue_amount_percent">60%</div>
@@ -99,8 +99,8 @@ import CoinsIcon from '@/components/icons/CoinsIcon.vue';
                     <p>Unclaimed Revenue</p>
                     <div class="revenue_claim_balance">
                         <div class="revenue_claim_balance_images">
-                            <img src="/images/theta.png" alt="">
-                            <img src="/images/tfuel.png" alt="">
+                            <img src="/images/logo.png" alt="">
+                            <img src="/images/logo.png" alt="">
                         </div>
                         <p>~ $14,215</p>
                     </div>

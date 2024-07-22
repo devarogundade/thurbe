@@ -16,13 +16,14 @@ interface IThube {
     event ClaimedTfuel(address streamer, uint256 amount);
 
     // === Streamer Functions ===
-    function create(string memory cardBaseURI) external;
-    function createExclusiveCard(
+    function create(
+        string memory cardBaseURI,
         string memory name,
         string memory symbol,
         uint256 mintPrice,
-        string memory baseURI
+        string memory cardExlusiveBaseURI
     ) external;
+
     function startStream(bytes32 streamId, bool exclusive, bool tips) external;
     function uploadVideo(bytes32 videoId, bool exclusive, bool tips) external;
     function endStream(bytes32 streamId) external;
@@ -36,4 +37,9 @@ interface IThube {
         address to,
         bool exclusive
     ) external payable;
+
+    function getCardId(
+        address streamer,
+        bool exclusive
+    ) external view returns (address);
 }

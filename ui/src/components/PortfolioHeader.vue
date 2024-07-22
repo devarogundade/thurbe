@@ -5,9 +5,12 @@ import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
 import ExportIcon from '@/components/icons/ExportIcon.vue';
 import WifiIcon from '@/components/icons/WifiIcon.vue';
 import CoinIcon from '@/components/icons/CoinIcon.vue';
-import GoLiveOption from '@/views/pops/GoLiveOption.vue';
-
+import { useWalletStore } from '@/stores/wallet';
 import { useRoute } from 'vue-router';
+import { type Account } from '@/types';
+import Converter from '@/scripts/converter';
+
+const walletStore = useWalletStore();
 
 const route = useRoute();
 </script>
@@ -15,24 +18,30 @@ const route = useRoute();
 <template>
     <div class="portfolio_container">
         <div class="portfolio_header">
-            <img src="/images/game.png" alt="" class="portfolio_header_cover">
+            <img :src="(walletStore.account as Account).channel!.cover || '/images/image_default.png'" alt=""
+                class="portfolio_header_cover">
             <div class="portfolio_header_content">
                 <div class="portfolio_name">
-                    <img src="/images/game.png" alt="">
+                    <img :src="(walletStore.account as Account).channel!.image || '/images/image_default.png'" alt="">
                     <div class="portfolio_name_text">
-                        <h3>The CartoonistGuy</h3>
+                        <h3>{{ (walletStore.account as Account).channel!.name }}</h3>
                         <div class="portfolio_name_follows">
                             <UserFullIcon />
-                            <p><span>24,478</span> Followers</p>
+                            <p><span>{{ (walletStore.account as Account).followers.length }}</span> Followers</p>
                         </div>
-                        <p class="joined">Joined November 2023</p>
+                        <p class="joined">Joined {{
+                            Converter.fullMonth(
+                                new Date((walletStore.account as Account).channel!.created_at)
+                            ) }}</p>
                     </div>
                 </div>
 
                 <div class="portfolio_follows">
-                    <button class="settings_btn">
-                        <Settings2Icon /> Settings
-                    </button>
+                    <RouterLink to="/portfolio/settings">
+                        <button class="settings_btn">
+                            <Settings2Icon /> Settings
+                        </button>
+                    </RouterLink>
 
                     <button class="menu_btn">
                         <ThreeDotsIcon />
@@ -80,8 +89,6 @@ const route = useRoute();
                 </div>
             </div>
         </div>
-
-        <!-- <GoLiveOption :account="{}" /> -->
     </div>
 </template>
 

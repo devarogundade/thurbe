@@ -13,10 +13,12 @@ import PortfolioView from '@/views/portfolio/PortfolioView.vue';
 import PortfolioVideos from '@/views/portfolio/PortfolioVideos.vue';
 import PortfolioStreams from '@/views/portfolio/PortfolioStreams.vue';
 import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';
+import PortfolioSettings from '@/views/portfolio/PortfolioSettings.vue';
 import GoLive from '@/views/create/GoLive.vue';
 import UploadVideo from '@/views/create/UploadVideo.vue';
 import CreateView from '@/views/create/CreateView.vue';
 import VideoDetail from '@/views/explore/details/VideoDetail.vue';
+import StreamDetail from '@/views/explore/details/StreamDetail.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,6 +60,11 @@ const router = createRouter({
           path: '/videos/:id',
           name: 'explore-videos-video',
           component: VideoDetail
+        },
+        {
+          path: '/streams/:id',
+          name: 'explore-streams-stream',
+          component: StreamDetail
         },
         {
           path: '/portfolio',
@@ -113,6 +120,11 @@ const router = createRouter({
               component: GoLive
             }
           ]
+        },
+        {
+          name: 'portfolio-settings',
+          path: '/portfolio/settings',
+          component: PortfolioSettings
         }
       ]
     },

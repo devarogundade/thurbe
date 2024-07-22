@@ -6,7 +6,7 @@ import { JobsOptions, Queue } from 'bullmq';
 import { Injectable } from '@nestjs/common';
 import { Account } from './database/schemas/account';
 import { Stream } from './database/schemas/stream';
-import { Paged, ViewerType } from './types';
+import { Paged, StreamType, ViewerType } from './types';
 import { Video } from './database/schemas/video';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Channel } from './database/schemas/channel';
@@ -35,6 +35,7 @@ export class AppService {
       if (exists) return null;
 
       const account: Account = {
+        _id: address,
         address,
         name,
         email,
@@ -64,12 +65,22 @@ export class AppService {
       if (exists) return null;
 
       const channel: Channel = {
+        _id: owner,
         owner,
         name,
         image,
         cover,
         created_at: new Date()
       };
+
+      await this.accountModel.updateOne(
+        { address: owner },
+        {
+          $set: {
+            channel: owner
+          }
+        }
+      );
 
       return this.channelModel.create(channel);
     } catch (error) {
@@ -79,15 +90,15 @@ export class AppService {
   }
 
   async followAccount(
-    address: string,
-    streamer: string
+    streamer: string,
+    viewer: string
   ): Promise<boolean> {
     try {
       await this.accountModel.updateOne({
-        address
+        address: streamer
       }, {
         $addToSet: {
-          followers: streamer
+          followers: viewer
         }
       });
 
@@ -99,15 +110,15 @@ export class AppService {
   }
 
   async unfollowAccount(
-    address: string,
-    streamer: string
+    streamer: string,
+    viewer: string
   ): Promise<boolean> {
     try {
       await this.accountModel.updateOne({
-        address
+        address: streamer
       }, {
         $pull: {
-          followers: streamer
+          followers: viewer
         }
       });
 
@@ -122,10 +133,13 @@ export class AppService {
     streamId: string,
     address: string,
     name: string,
+    description: string | null,
+    thetaId: string | null,
+    stream_server: string | null,
+    stream_key: string | null,
     thumbnail: string,
     viewerType: ViewerType,
-    playback_uri: string | null,
-    player_uri: string | null,
+    streamType: StreamType,
     tips: boolean,
     start_at: Date
   ): Promise<Stream | null> {
@@ -134,19 +148,24 @@ export class AppService {
       if (exists) return null;
 
       const stream: Stream = {
+        _id: streamId,
         streamId,
         name,
+        description,
         thumbnail,
         streamer: address,
-        playback_uri,
-        player_uri,
-        stream_server: '',
-        stream_key: '',
+        thetaId,
+        stream_server,
+        stream_key,
         tips,
         viewerType,
         created_at: new Date(),
         start_at,
-        viewers: []
+        viewers: [],
+        likes: [],
+        dislikes: [],
+        streamType,
+        live: false
       };
 
       const jobOptions: JobsOptions = {
@@ -174,23 +193,20 @@ export class AppService {
     }
   }
 
-  async startStream(
-    streamId: string,
-    tx_hash: string,
+  async joinStream(
+    viewer: string,
+    streamId: string
   ): Promise<boolean> {
     try {
-      await this.streamModel.updateOne({ streamId }, {
-        tx_hash
-      });
-
-      const jobOptions: JobsOptions = {
-        removeOnComplete: true,
-        removeOnFail: true
-      };
-
-      this.queue.add(streamId, { streamId, started: true },
-        jobOptions
-      );
+      if (viewer != 'undefined') {
+        await this.streamModel.updateOne({
+          streamId, live: true
+        }, {
+          $addToSet: {
+            viewers: viewer
+          }
+        });
+      }
 
       return true;
     } catch (error) {
@@ -199,16 +215,88 @@ export class AppService {
     }
   }
 
-  async joinStream(
-    streamId: string,
-    streamer: string
+  async likeStream(
+    viewer: string,
+    streamId: string
   ): Promise<boolean> {
     try {
       await this.streamModel.updateOne({
-        streamId
+        streamId, live: true
       }, {
         $addToSet: {
-          viewers: streamer
+          likes: viewer
+        },
+        $pull: {
+          dislikes: viewer
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async likeVideo(
+    viewer: string,
+    videoId: string
+  ): Promise<boolean> {
+    try {
+      await this.videoModel.updateOne({
+        videoId
+      }, {
+        $addToSet: {
+          likes: viewer
+        },
+        $pull: {
+          dislikes: viewer
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async dislikeStream(
+    viewer: string,
+    streamId: string
+  ): Promise<boolean> {
+    try {
+      await this.streamModel.updateOne({
+        streamId, live: true
+      }, {
+        $addToSet: {
+          dislikes: viewer
+        },
+        $pull: {
+          likes: viewer
+        }
+      });
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async dislikeVideo(
+    viewer: string,
+    videoId: string
+  ): Promise<boolean> {
+    try {
+      await this.videoModel.updateOne({
+        videoId
+      }, {
+        $addToSet: {
+          dislikes: viewer
+        },
+        $pull: {
+          likes: viewer
         }
       });
 
@@ -223,9 +311,10 @@ export class AppService {
     videoId: string,
     address: string,
     name: string,
+    description: string | null,
     thumbnail: string,
     viewerType: ViewerType,
-    playback_uri: string | null,
+    thetaId: string | null,
     tips: boolean,
   ): Promise<Video | null> {
     try {
@@ -233,16 +322,20 @@ export class AppService {
       if (exists) return null;
 
       const video: Video = {
+        _id: videoId,
         videoId,
         name,
+        description,
         thumbnail,
         streamer: address,
-        playback_uri,
+        thetaId,
         tips,
         viewerType,
         created_at: new Date(),
         viewers: [],
-        views: 0
+        views: 0,
+        likes: [],
+        dislikes: []
       };
 
       await this.accountModel.updateOne(
@@ -262,20 +355,30 @@ export class AppService {
   }
 
   async watchVideo(
-    videoId: string,
-    streamer: string
+    viewer: string,
+    videoId: string
   ): Promise<boolean> {
     try {
-      await this.videoModel.updateOne({
-        videoId
-      }, {
-        $addToSet: {
-          viewers: streamer
-        },
-        $inc: {
-          views: 1
-        }
-      });
+      if (viewer == 'undefined') {
+        await this.videoModel.updateOne({
+          videoId
+        }, {
+          $inc: {
+            views: 1
+          }
+        });
+      } else {
+        await this.videoModel.updateOne({
+          videoId
+        }, {
+          $addToSet: {
+            viewers: viewer
+          },
+          $inc: {
+            views: 1
+          }
+        });
+      }
 
       return true;
     } catch (error) {
@@ -297,7 +400,12 @@ export class AppService {
         .limit(TAKE_SIZE * 1)
         .skip((page - 1) * TAKE_SIZE)
         .sort({ start_at: 'desc' })
-        .populate(['streamer'])
+        .populate({
+          path: 'streamer',
+          populate: {
+            path: 'channel'
+          }
+        })
         .exec();
 
       const lastPage = Math.ceil(total / TAKE_SIZE);
@@ -314,11 +422,71 @@ export class AppService {
   ): Promise<Stream | null> {
     try {
       return this.streamModel.findOne({ streamId })
-        .populate(['streamer'])
+        .populate({
+          path: 'streamer',
+          populate: {
+            path: 'channel'
+          }
+        })
         .exec();
     } catch (error) {
       console.error(error);
       return null;
+    }
+  }
+
+  async updateStream(
+    streamId: string,
+    streamServer: string,
+    streamKey: string
+  ): Promise<boolean> {
+    try {
+      this.streamModel.updateOne(
+        { streamId, live: false },
+        {
+          $set: {
+            stream_server: streamServer,
+            stream_key: streamKey,
+            live: true
+          }
+        }
+      ).exec();
+
+      const jobOptions: JobsOptions = {
+        removeOnComplete: true,
+        removeOnFail: true
+      };
+
+      this.queue.add(streamId, { streamId, started: true },
+        jobOptions
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+
+  async endStream(
+    streamId: string,
+  ): Promise<boolean> {
+    try {
+      this.streamModel.updateOne(
+        { streamId, live: true },
+        {
+          $set: {
+            stream_server: null,
+            stream_key: null,
+            live: false
+          }
+        }
+      ).exec();
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   }
 
@@ -335,7 +503,12 @@ export class AppService {
         .limit(TAKE_SIZE * 1)
         .skip((page - 1) * TAKE_SIZE)
         .sort({ start_at: 'desc' })
-        .populate(['streamer'])
+        .populate({
+          path: 'streamer',
+          populate: {
+            path: 'channel'
+          }
+        })
         .exec();
 
       const lastPage = Math.ceil(total / TAKE_SIZE);
@@ -352,7 +525,12 @@ export class AppService {
   ): Promise<Video | null> {
     try {
       return this.videoModel.findOne({ videoId })
-        .populate(['streamer'])
+        .populate({
+          path: 'streamer',
+          populate: {
+            path: 'channel'
+          }
+        })
         .exec();
     } catch (error) {
       console.error(error);
@@ -365,6 +543,7 @@ export class AppService {
   ): Promise<Account | null> {
     try {
       return this.accountModel.findOne({ address })
+        .populate(['channel'])
         .exec();
     } catch (error) {
       console.error(error);
@@ -398,7 +577,7 @@ export class AppService {
     address: string
   ): Promise<Channel | null> {
     try {
-      return this.channelModel.findOne({ address })
+      return this.channelModel.findOne({ owner: address })
         .populate(['owner'])
         .exec();
     } catch (error) {

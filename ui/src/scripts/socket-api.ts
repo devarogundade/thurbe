@@ -2,22 +2,16 @@ import io, { Socket } from 'socket.io-client';
 export default class SocketAPI {
     private socket: Socket;
 
-    constructor(url: string) {
-        this.socket = io(url);
-
-        this.socket.on('connect', () => {
-            console.log('Connected to WebSocket server');
-        });
-
-        this.socket.on('disconnect', () => {
-            console.log('Disconnected from WebSocket server');
+    constructor() {
+        this.socket = io('http://localhost:8080', {
+            autoConnect: true,
         });
     }
 
     on(event: string, callback: (data: any) => void) {
-        if (this.socket.connected) {
-            this.socket.on(event, callback);
-        }
+        this.socket.on(event, (data) => {
+            callback(data);
+        });
     }
 
     emit(event: string, data: any) {

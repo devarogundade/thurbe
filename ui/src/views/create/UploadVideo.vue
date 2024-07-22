@@ -82,8 +82,8 @@ const uploadVideo = async () => {
 
     if (!walletStore.address) {
         notify.push({
-            title: 'Error: Select a video file',
-            description: 'Video file is mandatory',
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
             category: 'error'
         });
         return;
@@ -118,7 +118,7 @@ const uploadVideo = async () => {
 
     uploading.value = true;
 
-    const videoId = Contract.newVideoId();
+    const videoId = Contract.newId();
 
     const txHash = await Contract.uploadVideo(
         videoId,
@@ -136,9 +136,9 @@ const uploadVideo = async () => {
         return;
     }
 
-    const playbackUri = await ThetaAPI.uploadVideo(video.value.name, video.value.file);
+    const videoResponse = await ThetaAPI.uploadVideo(video.value.name, video.value.file);
 
-    if (!playbackUri) {
+    if (!videoResponse) {
         notify.push({
             title: 'Error: Uploading video file',
             description: 'Please try again',
@@ -156,7 +156,8 @@ const uploadVideo = async () => {
             video.value.description,
             thumbnailUrl,
             video.value.viewerType,
-            playbackUri,
+            // @ts-ignore
+            videoResponse.id,
             video.value.tips
         );
 
@@ -189,30 +190,32 @@ const uploadVideo = async () => {
 
 <template>
     <div class="upload_container">
-        <div class="toolbar">
-            <div class="nav_items">
-                <div class="nav" @click="back">
-                    <ArrowRightIcon />
-                    <p>Back</p>
+        <div class="toolbar_header">
+            <div class="toolbar">
+                <div class="nav_items">
+                    <div class="nav" @click="back">
+                        <ArrowRightIcon />
+                        <p>Back</p>
+                    </div>
                 </div>
-            </div>
-            <div class="tab_items">
-                <div :class="activeTab == 1 ? 'tab tab_active' : 'tab'">
-                    <p>Video Details</p>
+                <div class="tab_items">
+                    <div :class="activeTab == 1 ? 'tab tab_active' : 'tab'">
+                        <p>Video Details</p>
+                    </div>
+                    <div :class="activeTab == 2 ? 'tab tab_active' : 'tab'">
+                        <p>Preview</p>
+                    </div>
                 </div>
-                <div :class="activeTab == 2 ? 'tab tab_active' : 'tab'">
-                    <p>Preview</p>
-                </div>
-            </div>
-            <div class="nav_items">
-                <div class="nav" @click="next" v-if="activeTab == 1">
-                    <ArrowRightIcon style="rotate: 180deg;" />
-                    <p>Next</p>
-                </div>
+                <div class="nav_items">
+                    <div class="nav" @click="next" v-if="activeTab == 1">
+                        <ArrowRightIcon style="rotate: 180deg;" />
+                        <p>Next</p>
+                    </div>
 
-                <div class="nav nav_action" @click="uploadVideo" v-if="activeTab == 2">
-                    <ExportIcon />
-                    <p>Upload Video</p>
+                    <div class="nav nav_action" @click="uploadVideo" v-if="activeTab == 2">
+                        <ExportIcon />
+                        <p>Upload Video</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -388,12 +391,12 @@ const uploadVideo = async () => {
     </div>
 </template>
 
-
 <style scoped>
-.upload_container {
-    top: -66px;
+.toolbar_header {
+    top: 90px;
     position: sticky;
     z-index: 2;
+    height: 40px;
 }
 
 .toolbar {

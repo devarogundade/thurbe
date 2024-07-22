@@ -1,44 +1,137 @@
 <script setup lang="ts">
 import UserFullIcon from '@/components/icons/UserFullIcon.vue';
 import UserAddIcon from '@/components/icons/UserAddIcon.vue';
+import UserCheckIcon from '@/components/icons/UserCheckIcon.vue';
 import FlashIcon from '@/components/icons/FlashIcon.vue';
-import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
+// import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
 import SortIcon from '@/components/icons/SortIcon.vue';
-
+import Converter from '@/scripts/converter';
+import { useWalletStore } from '@/stores/wallet';
 import { useRoute } from 'vue-router';
+import Contract from '@/scripts/contract';
+import ThurbeAPI from '@/scripts/thurbe-api';
+import { notify } from '@/reactives/notify';
+import { ref } from "vue";
+import SuperFollow from '@/views/pops/SuperFollow.vue';
 
 const route = useRoute();
+const walletStore = useWalletStore();
+
+const emit = defineEmits(['refresh']);
+
+const props = defineProps({
+    channel: { type: Object, required: true },
+    isSuperFollow: { type: Boolean },
+    isFollow: { type: Boolean },
+});
+
+const super_follow = ref({
+    open: false,
+    amount: BigInt(0),
+    loading: false
+});
+
+const follow = async () => {
+    if (walletStore.address) {
+        const txHash = await Contract.mintCard(
+            props.channel.owner.address as `0x${string}`,
+            walletStore.address,
+            false,
+            BigInt(0)
+        );
+
+        if (txHash) {
+            notify.push({
+                title: 'Successful: Followed ' + props.channel.name,
+                description: 'Your profile has been updated successfully',
+                category: 'success'
+            });
+
+            await ThurbeAPI.followAccount(
+                props.channel.owner.address as `0x${string}`,
+                walletStore.address
+            );
+
+            emit('refresh');
+        }
+    }
+};
+
+const superFollow = async () => {
+    if (walletStore.address) {
+        const txHash = await Contract.mintCard(
+            props.channel.owner.address as `0x${string}`,
+            walletStore.address,
+            true,
+            super_follow.value.amount
+        );
+
+        super_follow.value.open = false;
+
+        if (txHash) {
+            notify.push({
+                title: 'Successful: Super followed ' + props.channel?.name,
+                description: 'Your profile has been updated successfully',
+                category: 'success'
+            });
+
+            await ThurbeAPI.followAccount(
+                props.channel.owner.address as `0x${string}`,
+                walletStore.address
+            );
+
+            emit('refresh');
+        }
+
+    }
+};
 </script>
 
 <template>
     <div class="channel_container">
         <div class="channel_header">
-            <img src="/images/game.png" alt="" class="channel_header_cover">
+            <img :src="props.channel.cover || '/images/image_default.png'" alt="" class="channel_header_cover">
             <div class="channel_header_content">
                 <div class="channel_name">
-                    <img src="/images/game.png" alt="">
+                    <img :src="props.channel.image" alt="">
                     <div class="channel_name_text">
-                        <h3>The CartoonistGuy</h3>
+                        <h3>{{ props.channel.name }}</h3>
                         <div class="channel_name_follows">
                             <UserFullIcon />
-                            <p><span>24,478</span> Followers</p>
+                            <p><span>{{ props.channel.owner?.followers?.length }}</span> Followers
+                            </p>
                         </div>
-                        <p class="joined">Joined November 2023</p>
+                        <p class="joined">Joined {{ Converter.fullMonth(
+                            new Date(props.channel.created_at)
+                        ) }}</p>
                     </div>
                 </div>
 
                 <div class="channel_follows">
-                    <button class="follow_btn">
-                        <UserAddIcon /> Follow
+                    <button v-if="isSuperFollow" class="creator_follow_super">
+                        <div class="creator_follow_icon">
+                            <FlashIcon :color="'var(--tx-normal)'" />
+                        </div>
+                        <p>Following</p>
                     </button>
 
-                    <button class="flash_btn">
+                    <button v-else-if="isFollow">
+                        <UserCheckIcon />
+                        <p>Following</p>
+                    </button>
+
+                    <button v-else-if="!isFollow" @click="follow">
+                        <UserAddIcon />
+                        <p>Follow</p>
+                    </button>
+
+                    <button v-if="!isSuperFollow" @click="super_follow.open = true">
                         <FlashIcon />
                     </button>
 
-                    <button class="menu_btn">
+                    <!-- <button class="menu_btn">
                         <ThreeDotsIcon />
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -63,6 +156,9 @@ const route = useRoute();
                 </div>
             </div>
         </div>
+
+        <SuperFollow :channel="props.channel" :amount="super_follow.amount" v-if="super_follow.open"
+            @close="super_follow.open = false" @continue="superFollow" />
     </div>
 </template>
 
@@ -150,33 +246,52 @@ const route = useRoute();
     gap: 24px;
 }
 
-.follow_btn {
+.creator_follows button:first-child {
+    padding: 0 20px;
+    height: 40px;
+    gap: 12px;
+    border-radius: 6px;
+    background: var(--bg-dark);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    background: var(--primary-light);
-    width: 123px;
-    height: 40px;
-    cursor: pointer;
     border: none;
+}
+
+.creator_follows button:first-child p {
     font-size: 14px;
     font-weight: 500;
     line-height: 14px;
-    border-radius: 6px;
     color: var(--tx-normal);
 }
 
-.flash_btn {
+.creator_follows button:last-child {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--primary);
+    border: none;
+}
+
+.creator_follow_super {
+    display: flex;
+    width: unset !important;
+    padding: 0 !important;
+    background: var(--bg-darker) !important;
+    padding-right: 20px !important;
+    overflow: hidden;
+}
+
+.creator_follow_icon {
     width: 40px;
     height: 40px;
-    cursor: pointer;
-    border: none;
-    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-darkest);
 }
 
 .menu_btn {

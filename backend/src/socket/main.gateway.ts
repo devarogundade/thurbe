@@ -12,9 +12,9 @@ import {
 } from "@nestjs/websockets";
 
 import { Server } from "socket.io";
-import { startFFmpeg } from "src/ffmpeg";
+import RtmpClient from "../rtmp-client";
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: true })
 export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
@@ -34,6 +34,14 @@ export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     console.debug(`Number of connected clients: ${sockets.size}`);
   }
 
+  @SubscribeMessage('chat')
+  handleChat(
+    @MessageBody() data: any,
+    // @ConnectedSocket() client: any,
+  ): void {
+    this.server.emit(`channel-${data.channelId}-chat`, data);
+  }
+
   @SubscribeMessage('reaction')
   handleReaction(
     @MessageBody() data: any,
@@ -42,20 +50,13 @@ export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.server.emit(`channel-${data.channelId}-reaction`, data);
   }
 
-  @SubscribeMessage('tip')
-  handleTip(
-    @MessageBody() data: any,
-    // @ConnectedSocket() client: any,
-  ): void {
-    this.server.emit(`channel-${data.channelId}-tip`, data);
-  }
-
   @SubscribeMessage('stream')
-  handleStream(
+  handleStreamVideo(
     @MessageBody() data: any,
     // @ConnectedSocket() client: any,
   ): void {
-    startFFmpeg(data.url, data.signal);
+    const rtmpClient = new RtmpClient(data.url);
+    rtmpClient.writeStream(data.stream);
   }
 
   @SubscribeMessage('stream-stop')
@@ -64,21 +65,5 @@ export class MainGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // @ConnectedSocket() client: any,
   ): void {
     this.server.emit(`channel-${data.channelId}-stream-stop`, data);
-  }
-
-  @SubscribeMessage('selfie')
-  handleSelfie(
-    @MessageBody() data: any,
-    // @ConnectedSocket() client: any,
-  ): void {
-    this.server.emit(`channel-${data.channelId}-selfie`, data);
-  }
-
-  @SubscribeMessage('selfie-stop')
-  handleSelfieStop(
-    @MessageBody() data: any,
-    // @ConnectedSocket() client: any,
-  ): void {
-    this.server.emit(`channel-${data.channelId}-selfie-stop`, data);
   }
 }

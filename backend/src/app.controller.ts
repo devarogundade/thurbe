@@ -36,25 +36,25 @@ export class AppController {
     );
   }
 
-  @Post('/follow-account/:address')
+  @Post('/follow-account/:streamer/:viewer')
   followAccount(
-    @Param('address') address: string,
-    @Body() streamer: string
+    @Param('streamer') streamer: string,
+    @Param('viewer') viewer: string
   ): Promise<boolean> {
     return this.appService.followAccount(
-      address.toLocaleLowerCase(),
       streamer.toLocaleLowerCase(),
+      viewer.toLocaleLowerCase(),
     );
   }
 
-  @Post('/unfollow-account/:address')
+  @Post('/unfollow-account/:streamer/:viewer')
   unfollowAccount(
-    @Param('address') address: string,
-    @Body() streamer: string
+    @Param('streamer') streamer: string,
+    @Param('viewer') viewer: string
   ): Promise<boolean> {
     return this.appService.unfollowAccount(
-      address.toLocaleLowerCase(),
       streamer.toLocaleLowerCase(),
+      viewer.toLocaleLowerCase(),
     );
   }
 
@@ -66,10 +66,13 @@ export class AppController {
       dto.streamId,
       (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
+      dto.description,
+      dto.thetaId,
+      dto.stream_server,
+      dto.stream_key,
       dto.thumbnail,
       dto.viewerType,
-      dto.playback_uri,
-      dto.player_uri,
+      dto.streamType,
       dto.tips,
       dto.start_at,
     );
@@ -78,20 +81,30 @@ export class AppController {
   @Post('/start-stream/:streamId')
   startStream(
     @Param('streamId') streamId: string,
-    @Body() txHash: string
+    @Query('streamServer') streamServer: string,
+    @Query('streamKey') streamKey: string
   ): Promise<boolean> {
-    return this.appService.startStream(
-      streamId, txHash
+    return this.appService.updateStream(
+      streamId, streamServer, streamKey
     );
   }
 
-  @Post('/join-stream/:address')
+  @Post('/end-stream/:streamId')
+  endStream(
+    @Param('streamId') streamId: string
+  ): Promise<boolean> {
+    return this.appService.endStream(
+      streamId
+    );
+  }
+
+  @Post('/join-stream/:viewer/:streamId')
   joinStream(
-    @Param('address') address: string,
-    @Body() streamId: string
+    @Param('viewer') viewer: string,
+    @Param('streamId') streamId: string
   ): Promise<boolean> {
     return this.appService.joinStream(
-      address.toLocaleLowerCase(),
+      viewer.toLocaleLowerCase(),
       streamId,
     );
   }
@@ -104,20 +117,65 @@ export class AppController {
       dto.videoId,
       (dto.streamer as string).toLocaleLowerCase(),
       dto.name,
+      dto.description,
       dto.thumbnail,
       dto.viewerType,
-      dto.playback_uri,
+      dto.thetaId,
       dto.tips
     );
   }
 
-  @Post('/watch-video/:address')
+  @Post('/watch-video/:viewer/:videoId')
   watchVideo(
-    @Param('address') address: string,
-    @Body() videoId: string
+    @Param('viewer') viewer: string,
+    @Param('videoId') videoId: string
   ): Promise<boolean> {
     return this.appService.watchVideo(
-      address.toLocaleLowerCase(),
+      viewer.toLocaleLowerCase(),
+      videoId,
+    );
+  }
+
+  @Post('/like-stream/:viewer/:streamId')
+  likeStream(
+    @Param('viewer') viewer: string,
+    @Param('streamId') streamId: string
+  ): Promise<boolean> {
+    return this.appService.likeStream(
+      viewer.toLocaleLowerCase(),
+      streamId,
+    );
+  }
+
+  @Post('/like-video/:viewer/:videoId')
+  likeVideo(
+    @Param('viewer') viewer: string,
+    @Param('videoId') videoId: string
+  ): Promise<boolean> {
+    return this.appService.likeVideo(
+      viewer.toLocaleLowerCase(),
+      videoId,
+    );
+  }
+
+  @Post('/dislike-stream/:viewer/:streamId')
+  dislikeStream(
+    @Param('viewer') viewer: string,
+    @Param('streamId') streamId: string
+  ): Promise<boolean> {
+    return this.appService.dislikeStream(
+      viewer.toLocaleLowerCase(),
+      streamId,
+    );
+  }
+
+  @Post('/dislike-video/:viewer/:videoId')
+  dislikeVideo(
+    @Param('viewer') viewer: string,
+    @Param('videoId') videoId: string
+  ): Promise<boolean> {
+    return this.appService.dislikeVideo(
+      viewer.toLocaleLowerCase(),
       videoId,
     );
   }

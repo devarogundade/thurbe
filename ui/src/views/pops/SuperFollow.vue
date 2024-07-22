@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import FlashIcon from '@/components/icons/FlashIcon.vue';
+import Converter from '@/scripts/converter';
 
 const emit = defineEmits(['close', 'continue']);
 
 const props = defineProps({
-    account: { type: Object, required: true }
+    channel: { type: Object, required: true },
+    amount: { required: true }
 });
 </script>
 
@@ -25,16 +27,16 @@ const props = defineProps({
 
             <div class="amount">
                 <img src="/images/tfuel.png" alt="">
-                <h3><span>121</span> TFUEL</h3>
-                <p>~$50.23</p>
+                <h3><span>{{ Converter.fromWei(props.amount) }}</span> TFUEL</h3>
+                <p>~$0.00</p>
             </div>
 
             <div class="creator">
-                <img src="/images/game.png" alt="">
-                <h3>The CartoonistGuy</h3>
+                <img :src="props.channel.image" alt="">
+                <h3>{{ props.channel.name }}</h3>
             </div>
 
-            <div class="pay">
+            <div class="pay" @click="emit('continue')">
                 <button>Make Payment</button>
             </div>
         </div>

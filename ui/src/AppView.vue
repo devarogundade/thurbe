@@ -6,11 +6,26 @@ import ThurbeAPI from '@/scripts/thurbe-api';
 import { onMounted, ref } from 'vue';
 import { useWalletStore } from '@/stores/wallet';
 import { WalletType } from '@/types';
+import { createWeb3Modal } from '@web3modal/wagmi/vue';
+import { useWeb3Modal } from '@web3modal/wagmi/vue';
+import { config, chains } from '@/scripts/config';
+import Metamask from '@/scripts/metamask';
 
 const walletStore = useWalletStore();
 
 // progress
 const fetchingAccount = ref<boolean>(false);
+
+createWeb3Modal({
+    wagmiConfig: config,
+    projectId: import.meta.env.VITE_PROJECT_ID,
+    // @ts-ignore
+    chains: chains,
+    enableAnalytics: true,
+    themeMode: 'light'
+});
+
+const modal = useWeb3Modal();
 
 const fetchAccount = async (address: string, walletType: WalletType) => {
     fetchingAccount.value = true;
@@ -30,6 +45,14 @@ onMounted(() => {
 
         if (address && walletType && address != 'null' && walletType != 'null') {
             fetchAccount(address, walletType as unknown as WalletType);
+        }
+
+        if ((walletType as unknown as WalletType) == WalletType.WalletConnect) {
+            // modal.open({ view: 'Connect' });
+        }
+
+        if ((walletType as unknown as WalletType) == WalletType.Metamask) {
+            Metamask.open(() => { });
         }
     } catch (error) {
         localStorage.clear();

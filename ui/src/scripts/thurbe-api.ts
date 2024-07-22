@@ -1,4 +1,4 @@
-import type { Account, Channel, Paged, React, Stream, Tip, Video, ViewerType } from '@/types';
+import type { Account, Channel, Paged, Stream, StreamType, Video, ViewerType } from '@/types';
 import axios from 'axios';
 
 const client = axios.create({
@@ -29,11 +29,16 @@ const ThurbeAPI = {
         name: string,
         image: string,
         cover: string | null
-    ): Promise<Account | null> {
+    ): Promise<Channel | null> {
         try {
-            const response = await client.post('/create-channel', {
-                address, name, image, cover
-            });
+            const channel: Channel = {
+                owner: address,
+                name,
+                image,
+                cover,
+                created_at: new Date()
+            };
+            const response = await client.post('/create-channel', channel);
 
             return response.data;
         } catch (error) {
@@ -43,11 +48,11 @@ const ThurbeAPI = {
     },
 
     async followAccount(
-        address: string,
-        streamer: string
+        streamer: string,
+        viewer: string
     ): Promise<boolean> {
         try {
-            const response = await client.post(`/follow-account/${address}`, streamer);
+            const response = await client.post(`/follow-account/${streamer}/${viewer}`);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -56,11 +61,11 @@ const ThurbeAPI = {
     },
 
     async unfollowAccount(
-        address: string,
-        streamer: string
+        streamer: string,
+        viewer: string
     ): Promise<boolean> {
         try {
-            const response = await client.post(`/unfollow-account/${address}`, streamer);
+            const response = await client.post(`/unfollow-account/${streamer}/${viewer}`);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -72,18 +77,34 @@ const ThurbeAPI = {
         streamId: string,
         address: string,
         name: string,
+        description: string | null,
+        thetaId: string | null,
         thumbnail: string,
-        exclusive: boolean,
-        playback_uri: string | null,
-        player_uri: string | null,
+        viewerType: ViewerType,
+        streamType: StreamType,
         tips: boolean,
         start_at: Date
     ): Promise<Stream | null> {
         try {
-            const response = await client.post('/create-stream', {
-                streamId, address, name, thumbnail,
-                exclusive, playback_uri, player_uri, tips, start_at
-            });
+            const stream: Stream = {
+                streamId,
+                streamer: address,
+                name, description,
+                thumbnail,
+                thetaId,
+                viewerType,
+                tips,
+                start_at,
+                stream_server: null,
+                stream_key: null,
+                viewers: [],
+                likes: [],
+                created_at: new Date(),
+                dislikes: [],
+                streamType,
+                live: false
+            };
+            const response = await client.post('/create-stream', stream);
 
             return response.data;
         } catch (error) {
@@ -92,12 +113,74 @@ const ThurbeAPI = {
         }
     },
 
+    async endStream(streamId: string): Promise<boolean> {
+        try {
+            const response = await client.post(`/end-stream/${streamId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
     async joinStream(
-        address: string,
+        viewer: string,
         streamId: string
     ): Promise<boolean> {
         try {
-            const response = await client.post(`/join-stream/${address}`, streamId);
+            const response = await client.post(`/join-stream/${viewer}/${streamId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
+    async likeStream(
+        viewer: string,
+        streamId: string
+    ): Promise<boolean> {
+        try {
+            const response = await client.post(`/like-stream/${viewer}/${streamId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
+    async likeVideo(
+        viewer: string,
+        videoId: string
+    ): Promise<boolean> {
+        try {
+            const response = await client.post(`/like-video/${viewer}/${videoId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
+    async dislikeStream(
+        viewer: string,
+        streamId: string
+    ): Promise<boolean> {
+        try {
+            const response = await client.post(`/dislike-stream/${viewer}/${streamId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+    },
+
+    async dislikeVideo(
+        viewer: string,
+        videoId: string
+    ): Promise<boolean> {
+        try {
+            const response = await client.post(`/dislike-video/${viewer}/${videoId}`);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -112,14 +195,27 @@ const ThurbeAPI = {
         description: string | null,
         thumbnail: string,
         viewerType: ViewerType,
-        playback_uri: string | null,
+        thetaId: string | null,
         tips: boolean,
     ): Promise<Video | null> {
         try {
-            const response = await client.post('/upload-video', {
-                videoId, address, name, thumbnail,
-                viewerType, playback_uri, tips
-            });
+            const payload: Video = {
+                videoId,
+                streamer: address,
+                name,
+                description,
+                thumbnail,
+                viewerType,
+                thetaId,
+                tips,
+                viewers: [],
+                views: 0,
+                created_at: new Date(),
+                likes: [],
+                dislikes: []
+            };
+
+            const response = await client.post('/upload-video', payload);
 
             return response.data;
         } catch (error) {
@@ -129,11 +225,11 @@ const ThurbeAPI = {
     },
 
     async watchVideo(
-        address: string,
+        viewer: string,
         videoId: string
     ): Promise<boolean> {
         try {
-            const response = await client.post(`/watch-video/${address}`, videoId);
+            const response = await client.post(`/watch-video/${viewer}/${videoId}`);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -166,9 +262,9 @@ const ThurbeAPI = {
         }
     },
 
-    async startStream(streamId: string, txHash: string): Promise<boolean> {
+    async startStream(streamId: string, streamServer: string, streamKey: string): Promise<boolean> {
         try {
-            const response = await client.post(`/start-stream/${streamId}`, txHash);
+            const response = await client.post(`/start-stream/${streamId}?streamServer=${streamServer}&streamKey=${streamKey}`);
             return response.data;
         } catch (error) {
             console.error(error);
@@ -215,13 +311,13 @@ const ThurbeAPI = {
 
     async getChannels(
         page: number,
-    ): Promise<Channel[]> {
+    ): Promise<Paged<Channel[]> | null> {
         try {
             const response = await client.get(`/channels?page=${page}`);
             return response.data;
         } catch (error) {
             console.error(error);
-            return [];
+            return null;
         }
     },
 

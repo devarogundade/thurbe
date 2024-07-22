@@ -1,41 +1,23 @@
 import { config } from './config';
-import { abi as thubeAbi } from '../abis/thurbe';
-import { waitForTransactionReceipt, writeContract } from '@wagmi/core';
+import { abi as thurbeAbi, cardAbi } from '../abis/thurbe';
+import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 
-export const thubeId: `0x${string}` = '0x';
+export const thurbeId: `0x${string}` = '0xB228793E1C1CBF71FbBccc55adAD4E1486c8762B';
+export const thurbeTokenId: `0x${string}` = '0xA8EE5d96C6005BA0Db924bf0518b1F4564428e55';
 
 const Contract = {
     // === Streamer Functions ===
-    async createStreamer(cardBaseURI: string): Promise<`0x${string}` | null> {
-        try {
-            const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
-                functionName: 'create',
-                args: [cardBaseURI]
-            });
-
-            const receipt = await waitForTransactionReceipt(config, { hash: result });
-
-            return receipt.transactionHash;
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    },
-
-    async createExclusiveCard(
+    async createStreamer(cardBaseURI: string,
         name: string,
         symbol: string,
         mintPrice: string,
-        baseURI: string
-    ): Promise<`0x${string}` | null> {
+        cardExlusiveBaseURI: string): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
-                functionName: 'createExclusiveCard',
-                args: [name, symbol, mintPrice, baseURI]
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'create',
+                args: [cardBaseURI, name, symbol, mintPrice, cardExlusiveBaseURI]
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -50,8 +32,8 @@ const Contract = {
     async startStream(streamId: `0x${string}`, exclusive: boolean, tips: boolean): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'startStream',
                 args: [streamId, exclusive, tips]
             });
@@ -68,8 +50,8 @@ const Contract = {
     async uploadVideo(videoId: `0x${string}`, exclusive: boolean, tips: boolean): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'uploadVideo',
                 args: [videoId, exclusive, tips]
             });
@@ -86,8 +68,8 @@ const Contract = {
     async endStream(streamId: `0x${string}`): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'endStream',
                 args: [streamId]
             });
@@ -106,8 +88,8 @@ const Contract = {
     ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'pauseTip',
                 args: [streamId]
             });
@@ -128,8 +110,8 @@ const Contract = {
     ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'tipStream',
                 args: [streamId, BigInt(amount)],
             });
@@ -149,8 +131,8 @@ const Contract = {
     ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'tipVideo',
                 args: [videoId, BigInt(amount)],
             });
@@ -167,14 +149,16 @@ const Contract = {
     async mintCard(
         streamer: `0x${string}`,
         to: `0x${string}`,
-        exclusive: boolean
+        exclusive: boolean,
+        value: bigint
     ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
-                abi: thubeAbi,
-                address: thubeId,
+                abi: thurbeAbi,
+                address: thurbeId,
                 functionName: 'mintCard',
                 args: [streamer, to, exclusive],
+                value
             });
 
             const receipt = await waitForTransactionReceipt(config, { hash: result });
@@ -186,12 +170,44 @@ const Contract = {
         }
     },
 
-    newVideoId(): `0x${string}` {
-        return `0x${'ab'}`;
+    async getCardId(
+        streamer: `0x${string}`,
+        exclusive: boolean
+    ): Promise<`0x${string}` | null> {
+        try {
+            return await readContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'getCardId',
+                args: [streamer, exclusive],
+            }) as `0x${string}`;
+        } catch (error) {
+
+            console.log(error);
+            return null;
+        }
     },
 
-    newStreamId(): `0x${string}` {
-        return `0x${'ab'}`;
+    async getMintPrice(
+        cardId: `0x${string}`,
+    ): Promise<bigint> {
+        try {
+            // @ts-ignore
+            return await readContract(config, {
+                abi: cardAbi,
+                address: cardId,
+                functionName: 'getMintPrice'
+            });
+        } catch (error) {
+            console.log(error);
+            return BigInt(0);
+        }
+    },
+
+    newId(): `0x${string}` {
+        const array = new Uint8Array(32);
+        window.crypto.getRandomValues(array);
+        return `0x${Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('')}`;
     }
 };
 

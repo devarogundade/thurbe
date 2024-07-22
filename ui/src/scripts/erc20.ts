@@ -1,7 +1,7 @@
 import { config } from './config';
 import type { Token } from './../types';
 import { waitForTransactionReceipt, getBalance, writeContract, readContract } from '@wagmi/core';
-import { erc20Abi } from 'viem';
+import { erc20Abi, erc721Abi } from 'viem';
 
 export async function getAllowance(tokenId: `0x${string}`, address: `0x${string}`, spender: `0x${string}`) {
     try {
@@ -45,6 +45,21 @@ export async function getTokenBalance(tokenId: `0x${string}`, address: `0x${stri
         console.log(error);
 
         return BigInt(0);
+    }
+}
+
+export async function getNftBalance(tokenId: `0x${string}`, address: `0x${string}`) {
+    try {
+        return await readContract(config, {
+            abi: erc721Abi,
+            address: tokenId,
+            functionName: 'balanceOf',
+            args: [address]
+        });
+    } catch (error) {
+        console.log(error);
+
+        return 0;
     }
 }
 

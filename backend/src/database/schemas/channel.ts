@@ -5,10 +5,12 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Account } from './account';
 
 export type ChannelDocument = HydratedDocument<Channel>;
-
 @Schema()
 export class Channel {
-    @Prop({ required: true, _id: true, unique: true, type: Types.ObjectId, ref: Account.name })
+    @Prop({ required: true, unique: true })
+    _id: string;
+
+    @Prop({ required: true, unique: true, type: Types.ObjectId, ref: 'Account' })
     owner: Account | string;
 
     @Prop({ required: true })

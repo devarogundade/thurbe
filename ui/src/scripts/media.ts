@@ -26,7 +26,7 @@ const Media = {
     },
 
     // Function to enable or disable the microphone
-    async toggleMicrophone(): Promise<MediaStream | null> {
+    async microphone(): Promise<MediaStream | null> {
         try {
             const microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
             // Use the stream (e.g., attach it to an audio element or send it over a peer connection)

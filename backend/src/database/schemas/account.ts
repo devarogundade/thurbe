@@ -11,6 +11,9 @@ export type AccountDocument = HydratedDocument<Account>;
 @Schema()
 export class Account {
     @Prop({ required: true, _id: true, unique: true })
+    _id: string;
+
+    @Prop({ required: true, unique: true })
     address: string;
 
     @Prop({ required: true })

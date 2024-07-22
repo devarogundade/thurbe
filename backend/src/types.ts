@@ -12,3 +12,8 @@ export enum ViewerType {
     Follower,
     SuperFollower
 }
+
+export enum StreamType {
+    Direct,
+    External
+}

@@ -1,6 +1,6 @@
 import type { Chat } from "@/types";
 import { initializeApp } from "firebase/app";
-import { doc, getFirestore, collection, query, where, getDocs, setDoc, deleteDoc, onSnapshot, getDoc } from "firebase/firestore";
+import { doc, getFirestore, collection, query, where, getDocs, setDoc, deleteDoc, onSnapshot, getDoc, orderBy } from "firebase/firestore";
 
 const ChatCollection: string = 'chats';
 
@@ -24,7 +24,9 @@ export function getChats(channelId: string, cb: (chats: Chat[]) => void) {
     const chatsRef = collection(db, ChatCollection);
 
     // Create a query against the collection.
-    const q = query(chatsRef, where("channelId", "==", channelId));
+    const q = query(chatsRef,
+        where("channelId", "==", channelId)
+    );
 
     onSnapshot(q, async () => {
         const snapshot = await getDocs(q);
@@ -32,29 +34,26 @@ export function getChats(channelId: string, cb: (chats: Chat[]) => void) {
         snapshot.forEach((doc) => {
             chats.push(doc.data() as Chat);
         });
-        cb(chats);
+        // @ts-ignore
+        cb(chats.sort((a, b) => b.timestamp - a.timestamp));
     });
 }
 
 export async function sendChat(
-    channelId: string,
-    text: string,
-    name: string,
-    image: string | null
+    chat: Chat
 ): Promise<boolean> {
     try {
-        const chat: Chat = {
-            channelId,
-            text,
-            from: { name, image },
-            timestamp: new Date()
-        };
-
-        await setDoc(doc(db, ChatCollection), chat);
+        await setDoc(doc(db, ChatCollection, newId()), chat);
 
         return true;
     } catch (error) {
         console.error(error);
         return false;
     }
+}
+
+function newId(): `0x${string}` {
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    return `0x${Array.from(array).map(byte => byte.toString(16).padStart(2, '0')).join('')}`;
 }

@@ -1,16 +1,27 @@
 <script setup lang="ts">
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
+import ProgressBox from '@/components/ProgressBox.vue';
 import { type Stream, type Account } from "@/types";
 import { onMounted, ref } from "vue";
 // @ts-ignore
 import { format as formatDate } from 'timeago.js';
 import Converter from '@/scripts/converter';
+import ThurbeAPI from '@/scripts/thurbe-api';
+import { useRoute } from 'vue-router';
 
-const getStreams = () => {
-
-};
-
+const route = useRoute();
+const loading = ref<boolean>(true);
 const streams = ref<Stream[]>([]);
+
+const getStreams = async () => {
+    loading.value = true;
+    const result = await ThurbeAPI.getStreams(1, route.params.id as any);
+    console.log(result);
+    if (result && result.data) {
+        streams.value = result.data;
+    }
+    loading.value = false;
+};
 
 onMounted(() => {
     getStreams();
@@ -18,16 +29,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="streams" v-if="streams.length > 0">
+    <div class="load_frame" v-if="loading">
+        <ProgressBox />
+    </div>
+
+    <div class="streams" v-else-if="!loading && streams.length > 0">
         <RouterLink v-for="stream, index in streams" :key="index" :to="`/streams/${stream.streamId}`">
             <div class="stream">
                 <div class="thumbnail">
                     <img :src="stream.thumbnail" alt="">
                     <div class="play_button"></div>
+                    <p class="live" v-show="stream.live">Live</p>
                 </div>
                 <div class="detail">
                     <div class="detail_content">
-                        <img :src="(stream.streamer as Account).channel?.image" alt="">
+                        <img :src="(stream.streamer as Account).channel?.image || '/images/image_default.png'" alt="">
                         <div class="detail_text">
                             <h3>{{ stream.name }}</h3>
                             <p>{{ (stream.streamer as Account).channel?.name }}. {{ formatDate(stream.created_at) }}</p>
@@ -44,6 +60,8 @@ onMounted(() => {
                 </div>
             </div>
         </RouterLink>
+
+        <div class="stream" v-if="streams.length % 2 == 1"></div>
     </div>
 
     <div class="empty" v-else>

@@ -2,17 +2,18 @@
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import HomeWifiIcon from '@/components/icons/HomeWifiIcon.vue';
 import DriverIcon from '@/components/icons/DriverIcon.vue';
-const emit = defineEmits(['close', 'continue']);
+import RadioToggleIcon from '@/components/icons/RadioToggleIcon.vue';
+import { StreamType } from '@/types';
+import { ref } from 'vue';
 
-const props = defineProps({
-    account: { type: Object, required: true }
-});
+const emit = defineEmits(['continue']);
+const streamType = ref<StreamType>(StreamType.Direct);
 </script>
 
 <template>
     <div class="blur">
         <div class="container">
-            <div class="close" @click="emit('close')">
+            <div class="close" @click="emit('continue', streamType)">
                 <CloseIcon />
             </div>
 
@@ -22,8 +23,10 @@ const props = defineProps({
             </div>
 
             <div class="viewers">
-                <div class="viewer">
-                    <div class="radio"></div>
+                <div class="viewer" @click="streamType = StreamType.Direct">
+                    <div class="radio">
+                        <RadioToggleIcon :active="streamType == StreamType.Direct" />
+                    </div>
                     <div class="viewer_title">
                         <HomeWifiIcon />
                         <p>Use a Direct stream</p>
@@ -34,8 +37,10 @@ const props = defineProps({
                     </p>
                 </div>
 
-                <div class="viewer">
-                    <div class="radio"></div>
+                <div class="viewer" @click="streamType = StreamType.External">
+                    <div class="radio">
+                        <RadioToggleIcon :active="streamType == StreamType.External" />
+                    </div>
                     <div class="viewer_title">
                         <DriverIcon />
                         <p>Use a Streaming Software</p>
@@ -48,7 +53,7 @@ const props = defineProps({
             </div>
 
             <div class="start">
-                <button>Continue</button>
+                <button @click="emit('continue', streamType)">Continue</button>
             </div>
         </div>
     </div>
@@ -130,6 +135,8 @@ const props = defineProps({
     padding: 14px;
     border-radius: 6px;
     border: 1px solid var(--bg-darkest);
+    position: relative;
+    cursor: pointer;
 }
 
 .viewer_title {
@@ -150,6 +157,12 @@ const props = defineProps({
     line-height: 18px;
     color: var(--tx-dimmed);
     margin-top: 10px;
+}
+
+.viewer .radio {
+    position: absolute;
+    top: 16px;
+    right: 14px;
 }
 
 .start {

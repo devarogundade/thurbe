@@ -15,6 +15,11 @@ export enum ViewerType {
     SuperFollower
 }
 
+export enum StreamType {
+    Direct,
+    External
+}
+
 export type AccountForm = {
     name: string | null,
     email: string | null,
@@ -30,6 +35,27 @@ export type VideoForm = {
     file_url: string | undefined;
     viewerType: ViewerType;
     tips: boolean;
+};
+
+export type StreamForm = {
+    name: string | undefined;
+    description: string | null;
+    thumbnail: File | undefined;
+    thumbnail_file_url: string | undefined;
+    viewerType: ViewerType;
+    streamType: StreamType;
+    tips: boolean;
+    start_at: Date;
+};
+
+export type ChannelForm = {
+    cover_file: File | undefined;
+    image_file: File | undefined;
+    name: string | undefined;
+    cover_file_url: string | undefined;
+    image_file_url: string | undefined;
+    super_amount: number | undefined;
+    super_follow: boolean;
 };
 
 export type Token = {
@@ -49,20 +75,20 @@ export interface Notification {
 
 export type React = {
     emoji: string;
-    text: string;
     from: {
         name: string;
-        image: string;
+        address: string;
+        image: string | null;
     };
     timestamp: Date;
 };
 
 export type Tip = {
     amount: string;
-    text: string;
     from: {
         name: string;
-        image: string;
+        address: string;
+        image: string | null;
     };
     timestamp: Date;
 };
@@ -80,7 +106,7 @@ export type Account = {
     name: string;
     image: string | null;
     email: string;
-    followers: Account[];
+    followers: string[] | Account[];
     channel: Channel | null;
     videos: Video[];
     streams: Stream[];
@@ -88,7 +114,7 @@ export type Account = {
 };
 
 export type Channel = {
-    owner: Account;
+    owner: Account | string;
     name: string;
     image: string;
     cover: string | null;
@@ -98,30 +124,36 @@ export type Channel = {
 export type Stream = {
     streamId: string;
     name: string;
+    description: string | null,
     thumbnail: string;
     streamer: Account | string;
-    playback_uri: string | null;
-    player_uri: string | null;
+    thetaId: string | null;
     stream_server: string | null;
     stream_key: string | null;
-    tx_hash: string | null;
     tips: boolean;
     viewers: Account[];
-    exclusive: boolean;
+    likes: string[];
+    dislikes: string[];
+    viewerType: ViewerType;
+    streamType: StreamType;
     created_at: Date;
     start_at: Date;
+    live: boolean;
 };
 
 export type Video = {
     videoId: string;
     name: string;
+    description: string | null,
     thumbnail: string;
     streamer: Account | string;
-    playback_uri: string | null;
+    thetaId: string | null;
     tips: boolean;
     viewers: Account[];
     views: number;
-    exclusive: boolean;
+    likes: string[];
+    dislikes: string[];
+    viewerType: ViewerType;
     created_at: Date;
 };
 
@@ -133,6 +165,8 @@ export type Paged<T> = {
 };
 
 export type CreatedStream = {
+    stream_server: string;
+    stream_key: string;
     id: string;
     name: string;
     status: string;
@@ -142,6 +176,7 @@ export type CreatedStream = {
 };
 
 export type StartedStream = {
+    id: string;
     stream_server: string;
     stream_key: string;
 };
@@ -151,7 +186,11 @@ export type Chat = {
     text: string;
     from: {
         name: string;
+        address: string;
         image: string | null;
     };
+    tip: {
+        amount: number;
+    },
     timestamp: Date;
 };

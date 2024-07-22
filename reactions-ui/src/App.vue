@@ -1,29 +1,24 @@
 <script setup lang="ts">
 import ThurbeLogo from '@/components/icons/ThurbeLogo.vue';
 import { ref, onMounted } from 'vue';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import SocketAPI from '@/scripts/socket-api';
+import type { Channel } from '@/types';
+import ThurbeAPI from '@/scripts/thurbe-api';
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FS_API_KEY,
-  authDomain: import.meta.env.VITE_FS_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FS_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FS_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FS_MSG_SENDER_ID,
-  appId: import.meta.env.VITE_FS_APP_ID,
-  measurementId: import.meta.env.VITE_FS_MEASUREMENT_ID,
-};
+const socketAPI = new SocketAPI();
 
-const app = initializeApp(firebaseConfig);
-
-getAnalytics(app);
-
-const listenToChats = () => {
-
-};
-
-const listenToTips = () => {
-
+type Chat = {
+  channelId: string,
+  text: string;
+  from: {
+    name: string;
+    address: string;
+    image: string | null;
+  };
+  tip: {
+    amount: number;
+  },
+  timestamp: Date;
 };
 
 interface Box {
@@ -33,15 +28,19 @@ interface Box {
     '--random-x2': string;
     '--random-x3': string;
   };
+  chat?: Chat;
+  emoji?: string;
+  type: 'chat' | 'reaction';
 }
 
 const boxes = ref<Box[]>([]);
+const channel = ref<Channel | null>(null);
 
 const getRandomInt = (min: number, max: number): string => {
   return `${Math.floor(Math.random() * (max - min + 1)) + min}vw`;
 };
 
-const createBox = (id: number): Box => {
+const createBox = (id: number, type: 'chat' | 'reaction', chat?: Chat, emoji?: string): Box => {
   return {
     id,
     styles: {
@@ -49,66 +48,100 @@ const createBox = (id: number): Box => {
       '--random-x2': getRandomInt(-5, 15),
       '--random-x3': getRandomInt(-5, 20),
     },
+    chat,
+    emoji,
+    type
   };
 };
 
-const removeBox = (index: number) => {
-  boxes.value.splice(index, 1);
+const removeBox = (id: number) => {
+  boxes.value.splice(boxes.value.findIndex((box) => box.id = id), 1);
 };
 
-const newBox = (id: number) => {
+const newChatBox = (chat: Chat) => {
   // Create multiple boxes
-  const box = createBox(id);
+  const box = createBox(boxes.value.length, 'chat', chat, undefined);
 
   boxes.value.push(box);
+};
 
-  // Add animation class after styles are applied
-  setTimeout(() => {
-    const boxElement = document.getElementsByClassName(`gift-box-${box.id}`)[0];
-    boxElement.classList.add('animated');
-  }, 100);
+const newReactBox = (emoji: string) => {
+  // Create multiple boxes
+  const box = createBox(boxes.value.length, 'reaction', undefined, emoji);
+  boxes.value.push(box);
+};
+
+const channelId = new URLSearchParams(window.location.search).get('id');
+
+const getStreamer = async () => {
+  if (channelId) {
+    channel.value = (await ThurbeAPI.getStream(channelId))?.streamer.channel || null;
+  }
 };
 
 onMounted(() => {
-  let index = 1;
-  setInterval(() => { newBox(index); index++; }, 1000);
+  socketAPI.on(`channel-${channelId}-chat`, (data: Chat) => {
+    newChatBox(data);
+  });
+
+  socketAPI.on(`channel-${channelId}-reaction`, (data: any) => {
+    newReactBox(data.emoji);
+  });
+
+  getStreamer();
 });
 </script>
 
 <template>
-  <section class="header_section">
-    <div class="app_width">
-      <header>
-        <div class="logo">
-          <ThurbeLogo />
-          <p>|</p>
-          <p>Reactions</p>
-        </div>
+  <main>
+    <section class="header_section">
+      <div class="app_width">
+        <header>
+          <div class="logo">
+            <ThurbeLogo />
+            <p>|</p>
+            <p>Reactions</p>
+          </div>
 
-        <div class="streamer">
-          <p>The CartoonistGuy</p>
-          <img src="/images/game.png" alt="">
-        </div>
-      </header>
-    </div>
-  </section>
+          <div class="streamer" v-if="channel">
+            <p>{{ channel.name }}</p>
+            <img :src="channel.image || '/images/image_default.png'" alt="">
+          </div>
+        </header>
+      </div>
+    </section>
 
-  <section class="reaction_section">
-    <div class="app_width">
-      <div class="reactions">
-        <div v-for="(box, index) in boxes" :key="box.id" :class="`gift-box gift-box-${box.id}`" :style="box.styles"
-          @animationend="removeBox(index)">
-          <div class="value">
-            <p>+2.354</p>
-            <img src="/images/theta.png" alt="">
+    <section class="reaction_section">
+      <div class="app_width">
+        <div class="reactions">
+          <div v-for="box, index in boxes" :key="index" :class="`gift-box gift-box-${box.id} animated`"
+            :style="{ ...box.styles, background: `url('${box.type == 'chat' ? box.chat!.tip.amount > 0 ? '/images/gift_2.png' : '/images/comment_2.png' : 'none'}') no-repeat center/contain` }"
+            @animationend="removeBox(box.id)">
+            <div class="user" v-if="box.type == 'chat'">
+              <img :src="box.chat!.from.image || '/images/image_default.png'" alt="">
+              <p>{{ box.chat!.from.name }}</p>
+            </div>
+            <div class="text" v-if="box.type == 'chat'">{{ box.chat!.text }}</div>
+            <div class="value" v-if="box.type == 'chat' && box.chat!.tip.amount > 0">
+              <p>+{{ box.chat!.tip.amount }}</p>
+              <img src="/images/logo.png" alt="">
+            </div>
+            <div class="emoji" v-if="box.type == 'reaction'">{{ box.emoji }}</div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 </template>
 
 <style scoped>
+main {
+  background: rgba(255, 255, 255, 0.4);
+  padding: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .header_section {
   overflow: hidden;
   background: rgba(255, 255, 255, 0.8);
@@ -145,6 +178,10 @@ header {
   font-size: 24px;
   margin-top: 4px;
   color: var(--tx-normal);
+  max-width: 120px;
+  text-wrap: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .streamer img {
@@ -155,7 +192,7 @@ header {
 }
 
 .reaction_section {
-  background: rgba(0, 0, 0, 0.1);
+  min-height: 500px;
 }
 
 .reactions {
@@ -168,12 +205,14 @@ header {
 .gift-box {
   width: 120px;
   height: 120px;
-  background: url('/images/gift_1.png') no-repeat center/contain;
   position: absolute;
   bottom: 0;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  align-items: center;
+  justify-content: flex-end;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
 }
 
 .value {
@@ -194,6 +233,36 @@ header {
   width: 18px;
   height: 18px;
   border-radius: 10px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user img {
+  width: 24px;
+  height: 24px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.user p {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--tx-normal);
+}
+
+.text {
+  width: 200px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.emoji {
+  font-size: 50px;
 }
 
 @keyframes moveUp {

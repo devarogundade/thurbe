@@ -32,7 +32,13 @@ contract Thurbe is IThube, AccessControl, Pausable {
         _thurbeToken = IERC20(thurbeToken);
     }
 
-    function create(string memory cardBaseURI) external override {
+    function create(
+        string memory cardBaseURI,
+        string memory name,
+        string memory symbol,
+        uint256 mintPrice,
+        string memory cardExlusiveBaseURI
+    ) external override {
         address streamer = _msgSender();
 
         require(_streamers[streamer].createdAt == 0);
@@ -46,27 +52,15 @@ contract Thurbe is IThube, AccessControl, Pausable {
         });
 
         _cardProvider.createCard(streamer, cardBaseURI);
-
-        emit StreamerCreated(streamer);
-    }
-
-    function createExclusiveCard(
-        string memory name,
-        string memory symbol,
-        uint256 mintPrice,
-        string memory baseURI
-    ) external override {
-        address streamer = _msgSender();
-
-        require(_streamers[streamer].createdAt > 0);
-
         _cardProvider.createExclusiveCard(
             streamer,
             name,
             symbol,
             mintPrice,
-            baseURI
+            cardExlusiveBaseURI
         );
+
+        emit StreamerCreated(streamer);
     }
 
     // === Streamer Functions ===
@@ -101,7 +95,7 @@ contract Thurbe is IThube, AccessControl, Pausable {
             ? _cardProvider.getExclusiveCard(streamer)
             : _cardProvider.getCard(streamer);
 
-        require(cardId != address(0), "Inclusive card not created");
+        require(cardId != address(0), "Card not created");
 
         _startVideo(videoId, streamer, cardId);
 
@@ -232,6 +226,16 @@ contract Thurbe is IThube, AccessControl, Pausable {
         streamerData.totalUnClaimedTfuel += amount;
 
         _cardProvider.mintCard(cardId, to);
+    }
+
+    function getCardId(
+        address streamer,
+        bool exclusive
+    ) external view override returns (address) {
+        return
+            exclusive
+                ? _cardProvider.getExclusiveCard(streamer)
+                : _cardProvider.getCard(streamer);
     }
 
     // === Internal Functions ===

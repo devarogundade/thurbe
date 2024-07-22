@@ -4,24 +4,48 @@ import axios from 'axios';
 const client = axios.create({
     baseURL: 'https://api.thetavideoapi.com',
     headers: {
-        'x-tva-sa-id': import.meta.env.THETA_ID,
-        'x-tva-sa-secret': import.meta.env.THETA_SECRET,
+        'x-tva-sa-id': import.meta.env.VITE_THETA_ID,
+        'x-tva-sa-secret': import.meta.env.VITE_TTHETA_SECRET,
         'Content-Type': 'application/json'
     }
 });
 
 const ThetaAPI = {
+    async getVideoUrl(id: string): Promise<string | null> {
+        try {
+            const response = await client.get(`/video/${id}`);
+            return response.data.body.videos[0].playback_uri;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
+    async getStreamUrl(id: string): Promise<string | null> {
+        try {
+            const response = await client.get(`/stream/${id}`);
+            return response.data.body.playback_uri;
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    },
+
     async uploadVideo(
         name: string,
         file: File,
         // nft_collection: string,
-    ): Promise<string | null> {
+    ): Promise<Object | null> {
         try {
             const createURL = await client.post(`/upload`);
 
             const data = createURL.data.body.uploads[0];
 
-            await client.put(createURL.data.presigned_url, file);
+            await axios.put(data.presigned_url, file, {
+                headers: {
+                    'Content-Type': 'application/octet-stream'
+                }
+            });
 
             const options = {
                 "source_upload_id": data.id,
@@ -42,11 +66,11 @@ const ThetaAPI = {
     },
 
     async createStream(
-        description: string
+        name: string
     ): Promise<CreatedStream | null> {
         try {
             const response = await client.post('/stream', {
-                name: description
+                name
             });
 
             return response.data.body as CreatedStream;
@@ -57,17 +81,24 @@ const ThetaAPI = {
     },
 
     async startStream(
-        thetaStreamId: string
+        id: string
     ): Promise<StartedStream | null> {
         try {
             const listIngestorsResponse = await client.get('/ingestor/filter');
-            const ingestor = listIngestorsResponse.data.body.ingestors[0].id;
+            if (listIngestorsResponse.data.body.ingestors.length > 0) {
+                const ingestor = listIngestorsResponse.data.body.ingestors[0].id;
 
-            const selectIngestorsResponse = await client.put(`/ingestor/${ingestor}/select`, {
-                tva_stream: thetaStreamId
-            });
+                const selectIngestorsResponse = await client.put(`/ingestor/${ingestor}/select`, {
+                    tva_stream: id
+                });
 
-            return selectIngestorsResponse.data.body as StartedStream;
+                return {
+                    id,
+                    ...selectIngestorsResponse.data.body
+                } as StartedStream;
+            } else {
+                return null;
+            }
         } catch (error) {
             console.error(error);
             return null;

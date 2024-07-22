@@ -1,16 +1,29 @@
 <script setup lang="ts">
 import UserAddIcon from '@/components/icons/UserAddIcon.vue';
+import UserCheckIcon from '@/components/icons/UserCheckIcon.vue';
 import VideoCircleIcon from '@/components/icons/VideoCircleIcon.vue';
+import ProgressBox from '@/components/ProgressBox.vue';
 import RadarIcon from '@/components/icons/RadarIcon.vue';
 import { type Channel, type Account } from "@/types";
 import { onMounted, ref } from "vue";
+// @ts-ignore
+import { format as formatDate } from 'timeago.js';
+import Converter from '@/scripts/converter';
+import ThurbeAPI from '@/scripts/thurbe-api';
+import { useWalletStore } from '@/stores/wallet';
+const walletStore = useWalletStore();
 
+const loading = ref<boolean>(true);
 const channels = ref<Channel[]>([]);
 
-const getChannels = () => {
-
+const getChannels = async () => {
+    loading.value = true;
+    const result = await ThurbeAPI.getChannels(1);
+    if (result && result.data) {
+        channels.value = result.data;
+    }
+    loading.value = false;
 };
-
 
 onMounted(() => {
     getChannels();
@@ -18,8 +31,13 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="channels" v-if="channels.length > 0">
-        <RouterLink v-for="channel, index in channels" :key="index" :to="`/channels/${channel.owner.address}`">
+    <div class="load_frame" v-if="loading">
+        <ProgressBox />
+    </div>
+
+    <div class="channels" v-else-if="!loading && channels.length > 0">
+        <RouterLink v-for="channel, index in channels" :key="index"
+            :to="`/channels/${(channel.owner as Account).address}`">
             <div class="channel">
                 <div class="thumbnail">
                     <img :src="channel.cover || '/images/image_default.png'" alt="">
@@ -29,11 +47,17 @@ onMounted(() => {
                         <img :src="channel.image" alt="">
                         <div class="detail_text">
                             <h3>{{ channel.name }}</h3>
-                            <p><span>{{ channel.owner.followers.length }} Followers</span></p>
+                            <p><span>{{ (channel.owner as Account).followers.length }} Followers</span></p>
                         </div>
                     </div>
 
-                    <button class="follow_button">
+                    <button class="follow_button"
+                        v-if="walletStore.address && ((channel.owner as Account).followers as string[]).includes(walletStore.address.toLocaleLowerCase())">
+                        <UserCheckIcon />
+                        <p>Following</p>
+                    </button>
+
+                    <button class="follow_button" v-else>
                         <UserAddIcon />
                         <p>Follow</p>
                     </button>
@@ -41,16 +65,18 @@ onMounted(() => {
                 <div class="stats">
                     <div class="stat">
                         <VideoCircleIcon />
-                        <p><span>{{ channel.owner.videos.length }}</span> Videos</p>
+                        <p><span>{{ (channel.owner as Account).videos.length }}</span> Videos</p>
                     </div>
 
                     <div class="stat">
                         <RadarIcon />
-                        <p><span>{{ channel.owner.streams.length }}</span> Streams</p>
+                        <p><span>{{ (channel.owner as Account).streams.length }}</span> Streams</p>
                     </div>
                 </div>
             </div>
         </RouterLink>
+
+        <div class="channel" v-if="channels.length % 2 == 1"></div>
     </div>
 
     <div class="empty" v-else>
@@ -140,7 +166,8 @@ onMounted(() => {
 
 .follow_button {
     background: var(--primary-light);
-    width: 105px;
+    min-width: 105px;
+    padding: 0 20px;
     height: 40px;
     display: flex;
     align-items: center;
