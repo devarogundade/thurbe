@@ -236,7 +236,7 @@ onMounted(() => {
                     <div class="file_picker">
                         <img :src="channel.cover_file_url" alt="" />
                         <div class="file_picker_text">
-                            <input type="file" :disabled="existingChannel != null" accept="image/*"
+                            <input type="file" :disabled="Boolean(existingChannel)" accept="image/*"
                                 @change="selectCover">
                             <div class="file_picker_text_text">
                                 <ImportIcon />
@@ -251,7 +251,7 @@ onMounted(() => {
                     <div class="file_picker">
                         <img :src="channel.image_file_url" alt="" class="profile_pic" />
                         <div class="file_picker_text">
-                            <input type="file" :disabled="existingChannel != null" accept="image/*"
+                            <input type="file" :disabled="Boolean(existingChannel)" accept="image/*"
                                 @change="selectImage">
                             <div class="file_picker_text_text">
                                 <ImportIcon />
@@ -263,7 +263,7 @@ onMounted(() => {
 
                 <div class="input">
                     <p class="label">Name <span>*</span></p>
-                    <input type="text" placeholder="John Doe" :disabled="existingChannel != null"
+                    <input type="text" placeholder="John Doe" :disabled="Boolean(existingChannel)"
                         v-model="channel.name" />
                 </div>
 
@@ -287,7 +287,7 @@ onMounted(() => {
                 </div>
 
 
-                <div class="input" v-show="!existingChannel">
+                <div class="input" v-show="!Boolean(existingChannel)">
                     <p class="label">Set Super Follow Fee <span>*</span></p>
                     <input type="number" placeholder="0.00" v-model="channel.super_amount" />
                 </div>

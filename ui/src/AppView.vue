@@ -39,24 +39,24 @@ const fetchAccount = async (address: string, walletType: WalletType) => {
 };
 
 onMounted(() => {
-    try {
-        const address = localStorage.getItem('address');
-        const walletType = localStorage.getItem('wallet-type');
+    // try {
+    //     const address = localStorage.getItem('address');
+    //     const walletType = localStorage.getItem('wallet-type');
 
-        if (address && walletType && address != 'null' && walletType != 'null') {
-            fetchAccount(address, walletType as unknown as WalletType);
-        }
+    //     if (address && walletType && address != 'null' && walletType != 'null') {
+    //         fetchAccount(address, walletType as unknown as WalletType);
+    //     }
 
-        if ((walletType as unknown as WalletType) == WalletType.WalletConnect) {
-            modal.open({ view: 'Connect' });
-        }
+    //     if ((walletType as unknown as WalletType) == WalletType.WalletConnect) {
+    //         modal.open({ view: 'Connect' });
+    //     }
 
-        if ((walletType as unknown as WalletType) == WalletType.Metamask) {
-            Metamask.open(() => { });
-        }
-    } catch (error) {
-        localStorage.clear();
-    }
+    //     if ((walletType as unknown as WalletType) == WalletType.Metamask) {
+    //         Metamask.open(() => { });
+    //     }
+    // } catch (error) {
+    //     localStorage.clear();
+    // }
 });
 </script>
 

@@ -217,7 +217,7 @@ const uploadVideo = async () => {
 
                     <div class="nav nav_action" @click="uploadVideo" v-if="activeTab == 2">
                         <ExportIcon />
-                        <p>Upload Video</p>
+                        <p>{{ uploading ? 'Uploading' : 'Upload Video' }}</p>
                     </div>
                 </div>
             </div>
