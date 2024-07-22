@@ -32,7 +32,7 @@ const props = defineProps({
             </div>
 
             <div class="creator">
-                <img src="/images/game.png" alt="">
+                <img :src="props.channel.image" alt="">
                 <h3>{{ props.channel.name }}</h3>
             </div>
 

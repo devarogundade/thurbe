@@ -400,10 +400,6 @@ const init = async () => {
         true
     );
 
-    if (exclusiveCardId) {
-        super_follow.value.amount = await Contract.getMintPrice(exclusiveCardId);
-    }
-
     if (walletStore.address) {
         if (cardId) {
             const cardBalance = await getNftBalance(cardId, walletStore.address);
@@ -424,7 +420,7 @@ const init = async () => {
         payable.value = isFollow.value || isSuperFollow.value;
     }
 
-    if (stream.value?.viewerType == ViewerType.Everyone) {
+    if (stream.value?.viewerType == ViewerType.SuperFollower) {
         payable.value = isSuperFollow.value;
     }
 
@@ -459,6 +455,10 @@ const init = async () => {
     }
 
     loading.value = false;
+
+    if (exclusiveCardId) {
+        super_follow.value.amount = await Contract.getMintPrice(exclusiveCardId);
+    }
 };
 
 const closeConfigs = () => {
@@ -531,7 +531,7 @@ onBeforeUnmount(() => {
                         <p>Super Follow</p>
                     </button>
                 </div>
-                <div class="restricted" @click="super_follow.open = true"
+                <div class="restricted"
                     v-else-if="stream.viewerType == ViewerType.Follower && !(isFollow || !isSuperFollow)">
                     <LockIcon />
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
