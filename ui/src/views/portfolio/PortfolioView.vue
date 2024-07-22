@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import PortfolioHeader from '@/components/PortfolioHeader.vue';
 import AirdropIcon from '@/components/icons/AirdropIcon.vue';
 import { useWalletStore } from '@/stores/wallet';

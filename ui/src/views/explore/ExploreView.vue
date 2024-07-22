@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import ExploreHeader from '@/components/ExploreHeader.vue';
 </script>
 

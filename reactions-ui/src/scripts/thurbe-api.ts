@@ -2,7 +2,7 @@ import type { Stream } from '@/types';
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: import.meta.env.VITE_BACKEND_URL
 });
 
 const ThurbeAPI = {

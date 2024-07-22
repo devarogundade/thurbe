@@ -3,7 +3,7 @@ export default class SocketAPI {
     private socket: Socket;
 
     constructor() {
-        this.socket = io('http://localhost:8080', {
+        this.socket = io(import.meta.env.VITE_BACKEND_URL, {
             autoConnect: true,
         });
     }
