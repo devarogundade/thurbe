@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
                 <div class="restricted" v-if="!videoUrl">
                     <LockIcon />
                     <h3>Video is not available.</h3>
-                    <p>This with video could be processing, wait and click on the refresh button.</p>
+                    <p>This video could be processing, wait and click on the refresh button.</p>
                     <button @click="refresh(false)">
                         <p>Refresh</p>
                     </button>

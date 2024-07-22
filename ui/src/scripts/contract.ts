@@ -204,6 +204,57 @@ const Contract = {
         }
     },
 
+    async getStreamer(
+        streamer: `0x${string}`,
+    ): Promise<`0x${string}` | null> {
+        try {
+            // @ts-ignore
+            return await readContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'getStreamer',
+                args: [streamer]
+            });
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async getStream(
+        streamId: `0x${string}`,
+    ): Promise<any> {
+        try {
+            // @ts-ignore
+            return await readContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'getStream',
+                args: [streamId]
+            });
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    async getVideo(
+        videoId: `0x${string}`,
+    ): Promise<any> {
+        try {
+            // @ts-ignore
+            return await readContract(config, {
+                abi: thurbeAbi,
+                address: thurbeId,
+                functionName: 'getVideo',
+                args: [videoId]
+            });
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
     newId(): `0x${string}` {
         const array = new Uint8Array(32);
         window.crypto.getRandomValues(array);
