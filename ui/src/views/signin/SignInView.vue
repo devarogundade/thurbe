@@ -157,9 +157,11 @@ const googleAuthRequest = async () => {
 
 onMounted(() => {
     watchAccount(config, {
-        onChange(account: any) {
-            walletStore.setAddress(account.address);
-            fetchAccount(account.address);
+        onChange(account) {
+            if (account.address) {
+                walletStore.setAddress(account.address);
+                fetchAccount(account.address);
+            }
         },
     });
 });
