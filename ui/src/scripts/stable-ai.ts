@@ -12,7 +12,9 @@ const StableAI = {
     async generate(prompt: string): Promise<ArrayBuffer | null> {
         try {
             const payload = {
-                prompt: `Generate a video thumbnail for: ${prompt}`, output_format: "webp"
+                prompt: `Generate a video thumbnail for: ${prompt}`,
+                output_format: "webp",
+                aspect_ratio: "16:9"
             };
 
             const data = axios.toFormData(payload, new FormData());
