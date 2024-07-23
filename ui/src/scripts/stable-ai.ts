@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const client = axios.create({
-    baseURL: 'https://api.stability.ai/v2beta',
+    baseURL: import.meta.env.VITE_STABLE_AI_URL,
     headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_STABLE_AI}`,
+        Authorization: `Bearer ${import.meta.env.VITE_STABLE_AI_KEY}`,
         Accept: "image/*"
     }
 });
