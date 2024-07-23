@@ -36,4 +36,6 @@
     --bg-darkest: rgba(232, 232, 232, 1);
     --bg-dark: rgba(247, 247, 247, 1);
     --bg-darker: rgba(240, 240, 240, 1);
+
+    --sm-red: #F06979;
 }

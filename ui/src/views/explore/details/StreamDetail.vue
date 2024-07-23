@@ -17,6 +17,7 @@ import EmojiIcon from '@/components/icons/EmojiIcon.vue';
 import SendIcon from '@/components/icons/SendIcon.vue';
 import MicIcon from '@/components/icons/MicIcon.vue';
 import ConfigIcon from '@/components/icons/ConfigIcon.vue';
+import OffWifiIcon from '@/components/icons/OffWifiIcon.vue';
 import StreamConfigs from '@/views/pops/StreamConfigs.vue';
 import { type Stream, type Account, ViewerType, type Chat, StreamType } from "@/types";
 import ProgressBox from '@/components/ProgressBox.vue';
@@ -646,13 +647,15 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
                     <div v-else>
-                        <div class="video_reaction start_stream" @click="stopStream">
-                            <MicIcon />
-                            <p>End Stream</p>
+                        <div class="video_reaction end_live" @click="stopStream">
+                            <div class="end_live_icon">
+                                <OffWifiIcon />
+                            </div>
+                            <p>End Live</p>
                         </div>
                     </div>
 
-                    <div class="video_reaction" @click="micToggle">
+                    <div class="video_reaction" v-if="stream.streamType == StreamType.Direct" @click="micToggle">
                         <MicIcon :active="stream.likes.includes(walletStore.address?.toLocaleLowerCase() || '')" />
                     </div>
                     <div class="video_reaction" @click="reacts = !reacts">
@@ -968,6 +971,30 @@ onBeforeUnmount(() => {
     width: unset;
     padding: 20px;
     gap: 10px;
+}
+
+.end_live {
+    width: unset;
+    padding: 0 10px 0 0;
+    gap: 10px;
+}
+
+.end_live p {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tx-normal);
+}
+
+.end_live_icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: var(--sm-red);
+    cursor: pointer;
+    position: relative;
 }
 
 .start_stream p {
