@@ -18,7 +18,7 @@ const walletStore = useWalletStore();
 
                 <div class="tabs">
                     <RouterLink to="/">Home</RouterLink>
-                    <a href="https://docs.thurbe.xyz" target="_blank">Docs
+                    <a href="https://devpost.com/software/thube" target="_blank">Docs
                         <OutIcon />
                     </a>
                     <a href="https://blog.thurbe.xyz" target="_blank">Blog
