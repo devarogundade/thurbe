@@ -35,7 +35,7 @@ const modal = useWeb3Modal();
                     <a href="https://devpost.com/software/thube" target="_blank">Docs
                         <OutIcon />
                     </a>
-                    <a href="https://blog.thurbe.xyz" target="_blank">Blog
+                    <a href="https://github.com/devarogundade/thurbe" target="_blank">GitHub
                         <OutIcon />
                     </a>
                 </div>
