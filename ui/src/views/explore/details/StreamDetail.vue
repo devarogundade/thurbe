@@ -49,6 +49,8 @@ const stream = ref<Stream | null>(null);
 const videoUrl = ref<string | null>(null);
 const isFollow = ref<boolean>(false);
 const isSuperFollow = ref<boolean>(false);
+const following = ref<boolean>(false);
+const superFollowing = ref<boolean>(false);
 const payable = ref<boolean>(false);
 const walletStore = useWalletStore();
 const tip = ref({
@@ -85,6 +87,7 @@ const getStream = async () => {
 };
 
 const follow = async () => {
+    if (following.value) return;
     if (!walletStore.address) {
         notify.push({
             title: 'Error: Connect your wallet',
@@ -93,6 +96,8 @@ const follow = async () => {
         });
         return;
     }
+
+    following.value = true;
 
     const txHash = await Contract.mintCard(
         (stream.value?.streamer as Account).address as `0x${string}`,
@@ -121,9 +126,12 @@ const follow = async () => {
             category: 'error'
         });
     }
+
+    following.value = false;
 };
 
 const superFollow = async () => {
+    if (superFollowing.value) return;
     if (!walletStore.address) {
         notify.push({
             title: 'Error: Connect your wallet',
@@ -132,6 +140,8 @@ const superFollow = async () => {
         });
         return;
     }
+
+    superFollowing.value = true;
 
     const txHash = await Contract.mintCard(
         (stream.value?.streamer as Account).address as `0x${string}`,
@@ -162,6 +172,8 @@ const superFollow = async () => {
             category: 'error'
         });
     }
+
+    superFollowing.value = false;
 };
 
 const setTip = (amount: number) => {
@@ -605,7 +617,7 @@ onBeforeUnmount(() => {
                         button below to follow.</p>
                     <button @click="follow">
                         <FlashIcon />
-                        <p>Follow</p>
+                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
                     </button>
                 </div>
                 <video ref="videoPlayer" v-show="payable && stream.live" controls id="video-js" class="video-js"
@@ -713,7 +725,7 @@ onBeforeUnmount(() => {
 
                     <button v-else-if="!isFollow" @click="follow">
                         <UserAddIcon />
-                        <p>Follow</p>
+                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
                     </button>
 
                     <button v-if="!isSuperFollow" @click="super_follow.open = true">
@@ -827,8 +839,9 @@ onBeforeUnmount(() => {
 
         <SendTip :channel="(stream.streamer as Account).channel!" v-if="tip.open" @close="tip.open = false"
             @continue="setTip" />
-        <SuperFollow :channel="(stream.streamer as Account).channel!" :amount="super_follow.amount"
-            v-if="super_follow.open" @close="super_follow.open = false" @continue="superFollow" />
+        <SuperFollow :loading="superFollowing" :channel="(stream.streamer as Account).channel!"
+            :amount="super_follow.amount" v-if="super_follow.open" @close="super_follow.open = false"
+            @continue="superFollow" />
         <StreamConfigs v-if="streamConfigs.open" @close="closeConfigs" :configs="streamConfigs.data" />
     </div>
 </template>

@@ -43,6 +43,8 @@ const video = ref<Video | null>(null);
 const videoUrl = ref<string | null>(null);
 const isFollow = ref<boolean>(false);
 const isSuperFollow = ref<boolean>(false);
+const following = ref<boolean>(false);
+const superFollowing = ref<boolean>(false);
 const payable = ref<boolean>(false);
 const walletStore = useWalletStore();
 const tip = ref({
@@ -71,70 +73,92 @@ const getVideo = async () => {
 };
 
 const follow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (following.value) return;
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    following.value = true;
+
+    const txHash = await Contract.mintCard(
+        (video.value?.streamer as Account).address as `0x${string}`,
+        walletStore.address,
+        false,
+        BigInt(0)
+    );
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Followed ' + (video.value?.streamer as Account).channel?.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             (video.value?.streamer as Account).address as `0x${string}`,
-            walletStore.address,
-            false,
-            BigInt(0)
+            walletStore.address
         );
 
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Followed ' + (video.value?.streamer as Account).channel?.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                (video.value?.streamer as Account).address as `0x${string}`,
-                walletStore.address
-            );
-
-            refresh();
-        } else {
-            notify.push({
-                title: 'Error: Interracting with smart contracts',
-                description: 'Please try again',
-                category: 'error'
-            });
-        }
+        refresh();
+    } else {
+        notify.push({
+            title: 'Error: Interracting with smart contracts',
+            description: 'Please try again',
+            category: 'error'
+        });
     }
+
+    following.value = false;
 };
 
 const superFollow = async () => {
-    if (walletStore.address) {
-        const txHash = await Contract.mintCard(
+    if (superFollowing.value) return;
+    if (!walletStore.address) {
+        notify.push({
+            title: 'Error: Connect your wallet',
+            description: 'Wallet connection is mandatory',
+            category: 'error'
+        });
+        return;
+    }
+
+    superFollowing.value = true;
+    const txHash = await Contract.mintCard(
+        (video.value?.streamer as Account).address as `0x${string}`,
+        walletStore.address,
+        true,
+        super_follow.value.amount
+    );
+
+    super_follow.value.open = false;
+
+    if (txHash) {
+        notify.push({
+            title: 'Successful: Super followed ' + (video.value?.streamer as Account).channel?.name,
+            description: 'Your profile has been updated successfully',
+            category: 'success'
+        });
+
+        await ThurbeAPI.followAccount(
             (video.value?.streamer as Account).address as `0x${string}`,
-            walletStore.address,
-            true,
-            super_follow.value.amount
+            walletStore.address
         );
 
-        super_follow.value.open = false;
-
-        if (txHash) {
-            notify.push({
-                title: 'Successful: Super followed ' + (video.value?.streamer as Account).channel?.name,
-                description: 'Your profile has been updated successfully',
-                category: 'success'
-            });
-
-            await ThurbeAPI.followAccount(
-                (video.value?.streamer as Account).address as `0x${string}`,
-                walletStore.address
-            );
-
-            refresh();
-        } else {
-            notify.push({
-                title: 'Error: Interracting with smart contracts',
-                description: 'Please try again',
-                category: 'error'
-            });
-        }
-
+        refresh();
+    } else {
+        notify.push({
+            title: 'Error: Interracting with smart contracts',
+            description: 'Please try again',
+            category: 'error'
+        });
     }
+
+    superFollowing.value = false;
 };
 
 const setTip = (amount: number) => {
@@ -436,7 +460,7 @@ onBeforeUnmount(() => {
                         button below to follow.</p>
                     <button @click="follow">
                         <FlashIcon />
-                        <p>Follow</p>
+                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
                     </button>
                 </div>
                 <video ref="videoPlayer" v-show="payable" controls id="video-js" class="video-js"
@@ -489,7 +513,7 @@ onBeforeUnmount(() => {
 
                     <button v-else-if="!isFollow" @click="follow">
                         <UserAddIcon />
-                        <p>Follow</p>
+                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
                     </button>
 
                     <button v-if="!isSuperFollow" @click="super_follow.open = true">
@@ -603,8 +627,9 @@ onBeforeUnmount(() => {
 
         <SendTip :channel="(video.streamer as Account).channel!" v-if="tip.open" @close="tip.open = false"
             @continue="setTip" />
-        <SuperFollow :channel="(video.streamer as Account).channel!" :amount="super_follow.amount"
-            v-if="super_follow.open" @close="super_follow.open = false" @continue="superFollow" />
+        <SuperFollow :loading="superFollowing" :channel="(video.streamer as Account).channel!"
+            :amount="super_follow.amount" v-if="super_follow.open" @close="super_follow.open = false"
+            @continue="superFollow" />
     </div>
 </template>
 

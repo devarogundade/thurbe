@@ -16,6 +16,8 @@ import SuperFollow from '@/views/pops/SuperFollow.vue';
 
 const route = useRoute();
 const walletStore = useWalletStore();
+const following = ref<boolean>(false);
+const superFollowing = ref<boolean>(false);
 
 const emit = defineEmits(['refresh']);
 
@@ -32,6 +34,7 @@ const super_follow = ref({
 });
 
 const follow = async () => {
+    if (following.value) return;
     if (!walletStore.address) {
         notify.push({
             title: 'Error: Connect your wallet',
@@ -40,6 +43,8 @@ const follow = async () => {
         });
         return;
     }
+
+    following.value = true;
 
     const txHash = await Contract.mintCard(
         props.channel.owner.address as `0x${string}`,
@@ -62,9 +67,12 @@ const follow = async () => {
 
         emit('refresh');
     }
+
+    following.value = false;
 };
 
 const superFollow = async () => {
+    if (superFollowing.value) return;
     if (!walletStore.address) {
         notify.push({
             title: 'Error: Connect your wallet',
@@ -73,6 +81,8 @@ const superFollow = async () => {
         });
         return;
     }
+
+    superFollowing.value = true;
 
     const txHash = await Contract.mintCard(
         props.channel.owner.address as `0x${string}`,
@@ -98,6 +108,12 @@ const superFollow = async () => {
 
         emit('refresh');
     }
+
+    superFollowing.value = false;
+};
+
+const isCreator = (): boolean => {
+    return (props.channel.owner.address == walletStore.address?.toLocaleLowerCase());
 };
 </script>
 
@@ -122,7 +138,7 @@ const superFollow = async () => {
                 </div>
 
                 <div class="channel_follows_wrapper">
-                    <div class="channel_follows">
+                    <div class="channel_follows" v-if="!isCreator()">
                         <button v-if="isSuperFollow" class="creator_follow_super">
                             <div class="creator_follow_icon">
                                 <FlashIcon :color="'var(--tx-normal)'" />
@@ -137,7 +153,7 @@ const superFollow = async () => {
 
                         <button v-else-if="!isFollow" @click="follow">
                             <UserAddIcon />
-                            <p>Follow</p>
+                            <p>{{ following ? 'Loading' : 'Follow' }}</p>
                         </button>
 
                         <button v-if="!isSuperFollow" @click="super_follow.open = true">
@@ -173,8 +189,8 @@ const superFollow = async () => {
             </div>
         </div>
 
-        <SuperFollow :channel="props.channel" :amount="props.superFollowAmount" v-if="super_follow.open"
-            @close="super_follow.open = false" @continue="superFollow" />
+        <SuperFollow :loading="superFollowing" :channel="props.channel" :amount="props.superFollowAmount"
+            v-if="super_follow.open" @close="super_follow.open = false" @continue="superFollow" />
     </div>
 </template>
 

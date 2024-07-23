@@ -7,7 +7,8 @@ const emit = defineEmits(['close', 'continue']);
 
 const props = defineProps({
     channel: { type: Object, required: true },
-    amount: { required: true }
+    amount: { required: true },
+    loading: { type: Boolean, required: true },
 });
 </script>
 
@@ -37,7 +38,7 @@ const props = defineProps({
             </div>
 
             <div class="pay" @click="emit('continue')">
-                <button>Make Payment</button>
+                <button>{{ loading ? 'Loading..' : 'Make Payment' }}</button>
             </div>
         </div>
     </div>
