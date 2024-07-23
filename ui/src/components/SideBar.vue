@@ -8,6 +8,18 @@ import TwitterIcon from '@/components/icons/TwitterIcon.vue';
 import DiscordIcon from '@/components/icons/DiscordIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
 import BubbleIcon from '@/components/icons/BubbleIcon.vue';
+import Metamask from '@/scripts/metamask';
+import { thurbeTokenId } from '@/scripts/contract';
+import { ref } from "vue";
+
+const importing = ref<boolean>(false);
+
+const importThurbe = async () => {
+    if (importing.value) return;
+    importing.value = true;
+    await Metamask.addToMetamask(thurbeTokenId, 'THUB', 'https://thurbe.xyz/images/logo.png');
+    importing.value = false;
+};
 
 const route = useRoute();
 </script>
@@ -99,6 +111,10 @@ const route = useRoute();
             </div>
         </div>
         <div class="links">
+            <button class="support" @click="importThurbe">
+                <img src="/images/logo.png" alt="">
+                <p>{{ importing ? 'Importing' : '$THUB' }}</p>
+            </button>
             <div class="socials">
                 <a href="#">
                     <MediumIcon class="social_icon" />
@@ -249,14 +265,27 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 20px;
-    text-decoration: none;
+    background: none;
+    border: none;
+    height: 36px;
+    border-radius: 6px;
 }
 
-.support h3 {
+.support:hover {
+    background: var(--bg-dark);
+}
+
+.support img {
+    width: 20px;
+    height: 20px;
+}
+
+.support p {
     font-weight: 500;
     font-size: 16px;
+    margin-top: 2px;
     color: var(--tx-normal);
 }
 

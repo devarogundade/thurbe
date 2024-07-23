@@ -53,6 +53,28 @@ const Metamask = {
                 }
             }
         }
+    },
+
+    addToMetamask: async function (address: string, symbol: string, image: string) {
+        try {
+            // @ts-ignore
+            await ethereum.request({
+                method: 'wallet_watchAsset',
+                params: {
+                    type: 'ERC20',
+                    options: {
+                        address,
+                        symbol,
+                        decimals: '18',
+                        image
+                    },
+                },
+            });
+            return true;
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
 };
 
