@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ThubeLogo from '@/components/icons/ThubeLogo.vue';
-import WalletIcon from '@/components/icons/WalletIcon.vue';
+import DiscoverIcon from '@/components/icons/DiscoverIcon.vue';
 import OutIcon from '@/components/icons/OutIcon.vue';
 </script>
 
@@ -24,12 +24,14 @@ import OutIcon from '@/components/icons/OutIcon.vue';
                     </a>
                 </div>
 
-                <div class="connect">
-                    <button>
-                        <WalletIcon />
-                        <p>Connect Wallet</p>
-                    </button>
-                </div>
+                <RouterLink to="/">
+                    <div class="connect">
+                        <button>
+                            <DiscoverIcon :color="'var(--tx-semi)'" />
+                            <p>Skip Connect</p>
+                        </button>
+                    </div>
+                </RouterLink>
             </header>
         </div>
     </section>
