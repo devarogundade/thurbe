@@ -7,6 +7,7 @@ import MediumIcon from '@/components/icons/MediumIcon.vue';
 import TwitterIcon from '@/components/icons/TwitterIcon.vue';
 import DiscordIcon from '@/components/icons/DiscordIcon.vue';
 import TelegramIcon from '@/components/icons/TelegramIcon.vue';
+import BubbleIcon from '@/components/icons/BubbleIcon.vue';
 
 const route = useRoute();
 </script>
@@ -83,6 +84,17 @@ const route = useRoute();
                             </div>
                         </RouterLink>
                     </div>
+                </div>
+                <div class="tab_parent">
+                    <RouterLink to="/ai">
+                        <div class="title">
+                            <BubbleIcon :color="(route.name as string)?.startsWith('ai') ? '#161618' : '#ABADAE'" />
+                            <h3>Thurbe AI</h3>
+                            <div
+                                :class="(route.name as string)?.startsWith('ai') ? 'indicator indicator_active' : 'indicator'">
+                            </div>
+                        </div>
+                    </RouterLink>
                 </div>
             </div>
         </div>

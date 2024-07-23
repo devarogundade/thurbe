@@ -10,6 +10,7 @@ import ChannelView from '@/views/channel/ChannelView.vue';
 import ChannelVideos from '@/views/channel/ChannelVideos.vue';
 import ChannelStreams from '@/views/channel/ChannelStreams.vue';
 import PortfolioView from '@/views/portfolio/PortfolioView.vue';
+import AIView from '@/views/portfolio/AIView.vue';
 import PortfolioVideos from '@/views/portfolio/PortfolioVideos.vue';
 import PortfolioStreams from '@/views/portfolio/PortfolioStreams.vue';
 import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';
@@ -19,6 +20,7 @@ import UploadVideo from '@/views/create/UploadVideo.vue';
 import CreateView from '@/views/create/CreateView.vue';
 import VideoDetail from '@/views/explore/details/VideoDetail.vue';
 import StreamDetail from '@/views/explore/details/StreamDetail.vue';
+import ThumbnailAI from '@/views/ai/ThumbnailAI.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -86,6 +88,16 @@ const router = createRouter({
               name: 'portfolio-revenue',
               component: PortfolioRevenue
             }]
+        },
+        {
+          path: '/ai',
+          name: 'ai',
+          component: AIView,
+          children: [{
+            path: '/ai',
+            name: 'ai-thumbnail',
+            component: ThumbnailAI,
+          }]
         },
         {
           path: '/channels/:id',
