@@ -3,7 +3,7 @@ import UserFullIcon from '@/components/icons/UserFullIcon.vue';
 import UserAddIcon from '@/components/icons/UserAddIcon.vue';
 import UserCheckIcon from '@/components/icons/UserCheckIcon.vue';
 import FlashIcon from '@/components/icons/FlashIcon.vue';
-// import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
+import ThreeDotsIcon from '@/components/icons/ThreeDotsIcon.vue';
 import SortIcon from '@/components/icons/SortIcon.vue';
 import Converter from '@/scripts/converter';
 import { useWalletStore } from '@/stores/wallet';
@@ -121,31 +121,33 @@ const superFollow = async () => {
                     </div>
                 </div>
 
-                <div class="channel_follows">
-                    <button v-if="isSuperFollow" class="creator_follow_super">
-                        <div class="creator_follow_icon">
-                            <FlashIcon :color="'var(--tx-normal)'" />
-                        </div>
-                        <p>Following</p>
-                    </button>
+                <div class="channel_follows_wrapper">
+                    <div class="channel_follows">
+                        <button v-if="isSuperFollow" class="creator_follow_super">
+                            <div class="creator_follow_icon">
+                                <FlashIcon :color="'var(--tx-normal)'" />
+                            </div>
+                            <p>Following</p>
+                        </button>
 
-                    <button v-else-if="isFollow">
-                        <UserCheckIcon />
-                        <p>Following</p>
-                    </button>
+                        <button v-else-if="isFollow">
+                            <UserCheckIcon />
+                            <p>Following</p>
+                        </button>
 
-                    <button v-else-if="!isFollow" @click="follow">
-                        <UserAddIcon />
-                        <p>Follow</p>
-                    </button>
+                        <button v-else-if="!isFollow" @click="follow">
+                            <UserAddIcon />
+                            <p>Follow</p>
+                        </button>
 
-                    <button v-if="!isSuperFollow" @click="super_follow.open = true">
-                        <FlashIcon />
-                    </button>
+                        <button v-if="!isSuperFollow" @click="super_follow.open = true">
+                            <FlashIcon />
+                        </button>
+                    </div>
 
-                    <!-- <button class="menu_btn">
+                    <button class="menu_btn">
                         <ThreeDotsIcon />
-                    </button> -->
+                    </button>
                 </div>
             </div>
         </div>
@@ -254,13 +256,19 @@ const superFollow = async () => {
     margin-top: 12px;
 }
 
+.channel_follows_wrapper {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
 .channel_follows {
     display: flex;
     align-items: center;
     gap: 24px;
 }
 
-.creator_follows button:first-child {
+.channel_follows button:first-child {
     padding: 0 20px;
     height: 40px;
     gap: 12px;
@@ -272,14 +280,14 @@ const superFollow = async () => {
     border: none;
 }
 
-.creator_follows button:first-child p {
+.channel_follows button:first-child p {
     font-size: 14px;
     font-weight: 500;
     line-height: 14px;
     color: var(--tx-normal);
 }
 
-.creator_follows button:last-child {
+.channel_follows button:last-child {
     width: 40px;
     height: 40px;
     border-radius: 6px;

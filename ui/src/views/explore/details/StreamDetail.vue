@@ -527,6 +527,22 @@ const stopStream = () => {
     refresh(false);
 };
 
+const share = () => {
+    try {
+        navigator.share({
+            title: stream.value?.name,
+            text: stream.value?.description || '',
+            url: `https://thurbe.xyz/streams/${stream.value?.streamId!}`
+        });
+    } catch (error) {
+        notify.push({
+            title: 'Error: cannot share',
+            description: 'Please try again',
+            category: 'error'
+        });
+    }
+};
+
 onMounted(() => {
     getStream();
 });
@@ -553,11 +569,19 @@ onBeforeUnmount(() => {
     <div class="detail_container" v-if="stream" v-show="!loading">
         <div class="detail_container_1">
             <div class="video_wrapper" :style="`background: url(${stream.thumbnail});`">
-                <div class="restricted" v-if="!stream.live || !videoUrl">
+                <div class="restricted" v-if="!stream.live">
                     <LockIcon />
                     <h3>Stream is not live or ended.</h3>
                     <p>{{ (stream.streamer as Account).name }} has scheduled this stream to {{
                         formatDate(stream.start_at) }}.</p>
+                    <button @click="refresh(false)">
+                        <p>Refresh</p>
+                    </button>
+                </div>
+                <div class="restricted" v-else-if="!videoUrl">
+                    <LockIcon />
+                    <h3>Stream is not yet feed.</h3>
+                    <p>The creator may have just started streaming or having connectivity issues. Wait and refresh.</p>
                     <button @click="refresh(false)">
                         <p>Refresh</p>
                     </button>
@@ -659,7 +683,7 @@ onBeforeUnmount(() => {
                         <DislikeIcon
                             :active="stream.dislikes.includes(walletStore.address?.toLocaleLowerCase() || '')" />
                     </div>
-                    <div class="video_reaction">
+                    <div class="video_reaction" @click="share">
                         <ShareIcon />
                     </div>
                 </div>

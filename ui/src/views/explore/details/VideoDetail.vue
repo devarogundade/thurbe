@@ -367,6 +367,22 @@ const refresh = async (isInit: boolean = true) => {
     }
 };
 
+const share = () => {
+    try {
+        navigator.share({
+            title: video.value?.name,
+            text: video.value?.description || '',
+            url: `https://thurbe.xyz/videos/${video.value?.videoId!}`
+        });
+    } catch (error) {
+        notify.push({
+            title: 'Error: cannot share',
+            description: 'Please try again',
+            category: 'error'
+        });
+    }
+};
+
 onMounted(() => {
     getVideo();
 });
@@ -443,7 +459,7 @@ onBeforeUnmount(() => {
                         <DislikeIcon
                             :active="video.dislikes.includes(walletStore.address?.toLocaleLowerCase() || '')" />
                     </div>
-                    <div class="video_reaction">
+                    <div class="video_reaction" @click="share">
                         <ShareIcon />
                     </div>
                 </div>

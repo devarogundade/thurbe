@@ -16,7 +16,7 @@ const claimingThurbe = ref<boolean>(false);
 
 const getRatio = (a: any, b: any) => {
     if (Number(a) == 0) return 0;
-    return Number((Number(a) / Number(a) + Number(b)) * 100).toFixed(0);
+    return Number((Number(a) / (Number(a) + Number(b))) * 100).toFixed(0);
 };
 
 const sum = (a: any, b: any) => {
@@ -113,7 +113,7 @@ onMounted(() => {
                         <div class="revenue_amount_percent">{{
                             getRatio(Converter.fromWei(revenue.totalUnClaimedTfuel),
                                 Converter.fromWei(revenue.totalClaimedTfuel))
-                        }}%</div>
+                        }}% Unclaimed</div>
                     </div>
                     <div class="revenue_amount_progress">
                         <div class="revenue_amount_bar"
@@ -136,7 +136,7 @@ onMounted(() => {
                         <div class="revenue_amount_percent">{{
                             getRatio(Converter.fromWei(revenue.totalClaimedTfuel),
                                 Converter.fromWei(revenue.totalUnClaimedTfuel))
-                        }}%</div>
+                        }}% Claimed</div>
                     </div>
                     <div class="revenue_amount_progress">
                         <div class="revenue_amount_bar"
@@ -184,7 +184,7 @@ onMounted(() => {
                         <div class="revenue_amount_percent">{{
                             getRatio(Converter.fromWei(revenue.totalUnClaimedThurbe),
                                 Converter.fromWei(revenue.totalClaimedThurbe))
-                        }}%</div>
+                        }}% Unclaimed</div>
                     </div>
                     <div class="revenue_amount_progress">
                         <div class="revenue_amount_bar"
@@ -206,7 +206,7 @@ onMounted(() => {
 
                         <div class="revenue_amount_percent">{{
                             getRatio(Converter.fromWei(revenue.totalClaimedThurbe),
-                                Converter.fromWei(revenue.totalUnClaimedThurbe)) }}%</div>
+                                Converter.fromWei(revenue.totalUnClaimedThurbe)) }}% Claimed</div>
                     </div>
                     <div class="revenue_amount_progress">
                         <div class="revenue_amount_bar"
