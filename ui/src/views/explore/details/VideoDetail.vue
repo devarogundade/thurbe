@@ -490,13 +490,15 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="creator">
-                <div class="creator_info">
-                    <img :src="(video.streamer as Account).channel?.image" alt="">
-                    <div class="creator_name">
-                        <h3>{{ (video.streamer as Account).channel?.name }}</h3>
-                        <p><span>{{ (video.streamer as Account).followers.length }}</span> Followers</p>
+                <RouterLink :to="`/channels/${(video.streamer as Account).address}`">
+                    <div class="creator_info">
+                        <img :src="(video.streamer as Account).channel?.image" alt="">
+                        <div class="creator_name">
+                            <h3>{{ (video.streamer as Account).channel?.name }}</h3>
+                            <p><span>{{ (video.streamer as Account).followers.length }}</span> Followers</p>
+                        </div>
                     </div>
-                </div>
+                </RouterLink>
 
                 <div class="creator_follow" v-if="!isCreator()">
                     <button v-if="isSuperFollow" class="creator_follow_super">
