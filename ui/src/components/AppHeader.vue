@@ -6,8 +6,22 @@ import WalletIcon from '@/components/icons/WalletIcon.vue';
 import { useWalletStore } from '@/stores/wallet';
 import Converter from '@/scripts/converter';
 import { WalletType } from '@/types';
+import { createWeb3Modal } from '@web3modal/wagmi/vue';
+import { useWeb3Modal } from '@web3modal/wagmi/vue';
+import { config, chains } from '@/scripts/config';
 
 const walletStore = useWalletStore();
+
+createWeb3Modal({
+    wagmiConfig: config,
+    projectId: import.meta.env.VITE_PROJECT_ID,
+    // @ts-ignore
+    chains: chains,
+    enableAnalytics: true,
+    themeMode: 'light'
+});
+
+const modal = useWeb3Modal();
 </script>
 
 <template>
@@ -38,16 +52,13 @@ const walletStore = useWalletStore();
                         </button>
                     </RouterLink>
 
-                    <RouterLink to="/portfolio" v-if="walletStore.account">
-                        <button>
-                            <img src="/images/metamask.png" v-if="walletStore.walletType == WalletType.Metamask" />
-                            <img src="/images/wallet_connect.png"
-                                v-if="walletStore.walletType == WalletType.WalletConnect" />
-                            <img src="/images/theta_wallet.png"
-                                v-if="walletStore.walletType == WalletType.ThetaWallet" />
-                            <p>{{ Converter.fineAddress(walletStore.address, 5) }}</p>
-                        </button>
-                    </RouterLink>
+                    <button v-if="walletStore.account" @click="modal.open({ view: 'Account' })">
+                        <img src="/images/metamask.png" v-if="walletStore.walletType == WalletType.Metamask" />
+                        <img src="/images/wallet_connect.png"
+                            v-if="walletStore.walletType == WalletType.WalletConnect" />
+                        <img src="/images/theta_wallet.png" v-if="walletStore.walletType == WalletType.ThetaWallet" />
+                        <p>{{ Converter.fineAddress(walletStore.address, 5) }}</p>
+                    </button>
 
                     <div class="settings_btn" v-if="walletStore.account">
                         <SettingsIcon />
