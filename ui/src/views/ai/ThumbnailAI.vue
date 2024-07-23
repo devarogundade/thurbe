@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import StableAI from '@/scripts/stable-ai.ts';
+import StableAI from '@/scripts/stable-ai.js';
 import ImportIcon from '@/components/icons/ImportIcon.vue';
 
 const loading = ref<boolean>(false);
