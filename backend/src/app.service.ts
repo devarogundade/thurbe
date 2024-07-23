@@ -502,7 +502,7 @@ export class AppService {
       const data = await this.videoModel.find(filter)
         .limit(TAKE_SIZE * 1)
         .skip((page - 1) * TAKE_SIZE)
-        .sort({ start_at: 'desc' })
+        .sort({ created_at: 'desc' })
         .populate({
           path: 'streamer',
           populate: {
