@@ -10,7 +10,7 @@ import ChannelView from '@/views/channel/ChannelView.vue';
 import ChannelVideos from '@/views/channel/ChannelVideos.vue';
 import ChannelStreams from '@/views/channel/ChannelStreams.vue';
 import PortfolioView from '@/views/portfolio/PortfolioView.vue';
-import AIView from '@/views/portfolio/AIView.vue';
+import AIView from '@/views/ai/AIView.vue';
 import PortfolioVideos from '@/views/portfolio/PortfolioVideos.vue';
 import PortfolioStreams from '@/views/portfolio/PortfolioStreams.vue';
 import PortfolioRevenue from '@/views/portfolio/PortfolioRevenue.vue';

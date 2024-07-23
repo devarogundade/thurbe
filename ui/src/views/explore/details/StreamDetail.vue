@@ -540,7 +540,7 @@ const refresh = async (isInit: boolean = true) => {
     }
 };
 
-const stopStream = () => {
+const stopStream = async () => {
     if (ending.value) return;
     ending.value = true;
 

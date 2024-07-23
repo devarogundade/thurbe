@@ -1,7 +1,33 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import StableAI from '@/scripts/stable-ai.ts';
+import ImportIcon from '@/components/icons/ImportIcon.vue';
 
+const loading = ref<boolean>(false);
 const prompt = ref<string | undefined>(undefined);
+const imageUrl = ref<string | undefined>(undefined);
+const downloadLink = ref<HTMLLinkElement | null>(null);
+
+const generate = async () => {
+    if (loading.value) return;
+    if (!prompt.value) return;
+
+    loading.value = true;
+
+    const data = await StableAI.generate(prompt.value);
+
+    if (data) {
+        const blob = new Blob([data], { type: 'image/webp' });
+        imageUrl.value = URL.createObjectURL(blob);
+    }
+
+    loading.value = false;
+};
+
+const download = () => {
+    if (!imageUrl) return;
+    downloadLink.value?.click();
+};
 </script>
 
 <template>
@@ -13,7 +39,17 @@ const prompt = ref<string | undefined>(undefined);
                 <textarea name="" id="" cols="30" rows="4" v-model="prompt"
                     placeholder="Enter prompt to generate thumbnail"></textarea>
             </div>
-            <button>Generate</button>
+            <button @click="generate">{{ loading ? 'Loading..' : 'Generate' }}</button>
+        </div>
+
+        <div class="output" v-if="imageUrl">
+            <div class="output_image">
+                <img :src="imageUrl" alt="">
+            </div>
+            <a :href="imageUrl" :download="'thurbeai_image.webp'" ref="downloadLink" style="display:none;"> </a>
+            <button @click="download">
+                <ImportIcon />
+            </button>
         </div>
     </div>
 </template>
@@ -23,6 +59,8 @@ const prompt = ref<string | undefined>(undefined);
 .detail_form_wrapper {
     display: flex;
     justify-content: center;
+    flex-direction: column;
+    align-items: center;
     margin-top: 60px;
 }
 
@@ -92,6 +130,42 @@ const prompt = ref<string | undefined>(undefined);
 .detail_form button {
     background: var(--primary);
     width: 140px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    gap: 10px;
+    border: none;
+    color: var(--bg);
+    cursor: pointer;
+    user-select: none;
+}
+
+.output {
+    display: flex;
+    justify-content: center;
+    margin-top: 60px;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+}
+
+.output_image {
+    width: 400px;
+}
+
+.output_image img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.output button {
+    position: absolute;
+    bottom: 20px;
+    z-index: 1;
+    background: var(--primary);
+    width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
