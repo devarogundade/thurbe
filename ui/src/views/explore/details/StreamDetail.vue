@@ -52,6 +52,7 @@ const isFollow = ref<boolean>(false);
 const isSuperFollow = ref<boolean>(false);
 const following = ref<boolean>(false);
 const starting = ref<boolean>(false);
+const ending = ref<boolean>(false);
 const superFollowing = ref<boolean>(false);
 const payable = ref<boolean>(false);
 const walletStore = useWalletStore();
@@ -528,7 +529,6 @@ const isCreator = (): boolean => {
     return (stream.value?.streamer as Account)?.address == walletStore.address?.toLocaleLowerCase();
 };
 
-
 const refresh = async (isInit: boolean = true) => {
     if (isInit) {
         init();
@@ -541,11 +541,18 @@ const refresh = async (isInit: boolean = true) => {
 };
 
 const stopStream = () => {
-    ThurbeAPI.endStream(stream.value?.streamId!);
+    if (ending.value) return;
+    ending.value = true;
+
+    await ThurbeAPI.endStream(stream.value?.streamId!);
+
     if (player) {
         player.pause();
         player.currentTime(0);
     }
+
+    ending.value = false;
+
     refresh(false);
 };
 
@@ -660,7 +667,7 @@ onBeforeUnmount(() => {
                             <div class="end_live_icon">
                                 <OffWifiIcon />
                             </div>
-                            <p>End Live</p>
+                            <p>{{ ending ? 'Loading..' : 'End Live' }}</p>
                         </div>
                     </div>
 
