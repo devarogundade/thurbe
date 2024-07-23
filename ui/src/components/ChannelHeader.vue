@@ -153,7 +153,7 @@ const isCreator = (): boolean => {
 
                         <button v-else-if="!isFollow" @click="follow">
                             <UserAddIcon />
-                            <p>{{ following ? 'Loading' : 'Follow' }}</p>
+                            <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                         </button>
 
                         <button v-if="!isSuperFollow" @click="super_follow.open = true">

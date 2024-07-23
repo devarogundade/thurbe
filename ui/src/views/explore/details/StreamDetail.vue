@@ -51,6 +51,7 @@ const videoUrl = ref<string | null>(null);
 const isFollow = ref<boolean>(false);
 const isSuperFollow = ref<boolean>(false);
 const following = ref<boolean>(false);
+const starting = ref<boolean>(false);
 const superFollowing = ref<boolean>(false);
 const payable = ref<boolean>(false);
 const walletStore = useWalletStore();
@@ -350,6 +351,8 @@ const micToggle = () => {
 };
 
 const startStream = async () => {
+    if (starting.value) return;
+    starting.value = true;
     let createdStream = await ThetaAPI.startStream(stream.value?.thetaId!);
 
     if (!createdStream) {
@@ -369,6 +372,7 @@ const startStream = async () => {
             description: 'Please try again',
             category: 'error'
         });
+        starting.value = true;
         return;
     }
 
@@ -384,6 +388,7 @@ const startStream = async () => {
             description: 'Please try again',
             category: 'error'
         });
+        starting.value = true;
         return;
     }
 
@@ -403,12 +408,14 @@ const startStream = async () => {
             category: 'success'
         });
 
+        starting.value = true;
         return;
     }
 
     const videoStream = await Media.screenShare();
 
     if (!videoStream) {
+        starting.value = true;
         return;
     }
 
@@ -432,6 +439,8 @@ const startStream = async () => {
         description: 'We have notified your followers',
         category: 'success'
     });
+
+    starting.value = true;
 };
 
 const init = async () => {
@@ -618,7 +627,7 @@ onBeforeUnmount(() => {
                         button below to follow.</p>
                     <button @click="follow">
                         <FlashIcon />
-                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
+                        <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
                 </div>
                 <video ref="videoPlayer" v-show="payable && stream.live" controls id="video-js" class="video-js"
@@ -638,7 +647,7 @@ onBeforeUnmount(() => {
                         <div class="video_reaction start_stream" v-if="stream.streamType == StreamType.External"
                             @click="startStream">
                             <ConfigIcon />
-                            <p>Live Configs</p>
+                            <p>{{ starting ? 'Loading..' : 'Live Configs' }}</p>
                         </div>
                         <div class="video_reaction start_stream" v-if="stream.streamType == StreamType.Direct"
                             @click="startStream">
@@ -728,7 +737,7 @@ onBeforeUnmount(() => {
 
                     <button v-else-if="!isFollow" @click="follow">
                         <UserAddIcon />
-                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
+                        <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
 
                     <button v-if="!isSuperFollow" @click="super_follow.open = true">

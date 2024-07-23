@@ -460,7 +460,7 @@ onBeforeUnmount(() => {
                         button below to follow.</p>
                     <button @click="follow">
                         <FlashIcon />
-                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
+                        <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
                 </div>
                 <video ref="videoPlayer" v-show="payable" controls id="video-js" class="video-js"
@@ -513,7 +513,7 @@ onBeforeUnmount(() => {
 
                     <button v-else-if="!isFollow" @click="follow">
                         <UserAddIcon />
-                        <p>{{ following ? 'Loading' : 'Follow' }}</p>
+                        <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
 
                     <button v-if="!isSuperFollow" @click="super_follow.open = true">
