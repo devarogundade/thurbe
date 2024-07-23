@@ -8,11 +8,13 @@ export const thurbeTokenId: `0x${string}` = '0xbC91a7FF276DCa355124E924E1994F1E1
 
 const Contract = {
     // === Streamer Functions ===
-    async createStreamer(cardBaseURI: string,
+    async createStreamer(
+        cardBaseURI: string,
         name: string,
         symbol: string,
         mintPrice: string,
-        cardExlusiveBaseURI: string): Promise<`0x${string}` | null> {
+        cardExlusiveBaseURI: string
+    ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
                 abi: thurbeAbi,
@@ -30,7 +32,11 @@ const Contract = {
         }
     },
 
-    async startStream(streamId: `0x${string}`, exclusive: boolean, tips: boolean): Promise<`0x${string}` | null> {
+    async startStream(
+        streamId: `0x${string}`,
+        exclusive: boolean,
+        tips: boolean
+    ): Promise<`0x${string}` | null> {
         try {
             const result = await writeContract(config, {
                 abi: thurbeAbi,

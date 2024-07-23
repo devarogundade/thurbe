@@ -57,6 +57,10 @@ onMounted(() => {
     // } catch (error) {
     //     localStorage.clear();
     // }
+
+    if (walletStore.address) {
+        Metamask.switchToThetaTestnet();
+    }
 });
 </script>
 

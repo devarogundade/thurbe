@@ -50,6 +50,14 @@ const connectWallet = () => {
             fetchAccount(address);
         });
     }
+
+    if (walletStore.walletType == WalletType.ThetaWallet) {
+        notify.push({
+            title: 'WIP: use wallet connect.',
+            description: 'Thank you and try again.',
+            category: 'error'
+        });
+    }
 };
 
 const fetchAccount = async (address: string) => {
@@ -139,7 +147,11 @@ const googleAuthRequest = async () => {
             image: result.user.photoURL
         };
     } catch (error) {
-
+        notify.push({
+            title: 'Error: failed to derive account.',
+            description: 'Please try again.',
+            category: 'error'
+        });
     }
 };
 
@@ -163,7 +175,7 @@ onMounted(() => {
                 </div>
 
                 <div class="signin_wallets">
-                    <div :class="walletStore.walletType == WalletType.Metamask ? `signin_wallet signin_wallet_active` : `signin_wallet`"
+                    <!-- <div :class="walletStore.walletType == WalletType.Metamask ? `signin_wallet signin_wallet_active` : `signin_wallet`"
                         @click="() => { selectWalletType(WalletType.Metamask); }">
                         <div class="signin_wallet_name">
                             <img src="/images/metamask.png" alt="metamask">
@@ -173,7 +185,7 @@ onMounted(() => {
                         <div class="signin_wallet_radio">
                             <div class="signin_wallet_radio_inner"></div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div :class="walletStore.walletType == WalletType.WalletConnect ? `signin_wallet signin_wallet_active` : `signin_wallet`"
                         @click="() => { selectWalletType(WalletType.WalletConnect); }">
