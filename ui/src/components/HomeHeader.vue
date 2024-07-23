@@ -2,9 +2,6 @@
 import ThubeLogo from '@/components/icons/ThubeLogo.vue';
 import WalletIcon from '@/components/icons/WalletIcon.vue';
 import OutIcon from '@/components/icons/OutIcon.vue';
-
-
-
 </script>
 
 <template>
