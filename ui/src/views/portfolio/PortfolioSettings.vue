@@ -289,7 +289,7 @@ onMounted(() => {
 
 
                 <div class="input" v-show="!Boolean(existingChannel)">
-                    <p class="label">Set Super Follow Fee <span>*</span></p>
+                    <p class="label">Set Super Follow Fee (TFUEL) <span>*</span></p>
                     <input type="number" placeholder="0.00" v-model="channel.super_amount" />
                 </div>
             </div>

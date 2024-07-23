@@ -513,7 +513,7 @@ onBeforeUnmount(() => {
                         <p>Following</p>
                     </button>
 
-                    <button v-else-if="!isFollow" @click="follow">
+                    <button v-else-if="!isFollow" @click="follow" class="creator_follow_light">
                         <UserAddIcon />
                         <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
@@ -825,6 +825,11 @@ onBeforeUnmount(() => {
     justify-content: center;
     border: none;
 }
+
+.creator_follow_light {
+    background: var(--primary-light);
+}
+
 
 .video_contents {
     margin-top: 30px;
