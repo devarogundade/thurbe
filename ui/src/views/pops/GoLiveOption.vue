@@ -7,7 +7,7 @@ import { StreamType } from '@/types';
 import { ref } from 'vue';
 
 const emit = defineEmits(['continue']);
-const streamType = ref<StreamType>(StreamType.Direct);
+const streamType = ref<StreamType>(StreamType.External);
 </script>
 
 <template>

@@ -252,7 +252,9 @@ const uploadVideo = async () => {
                 </div>
 
                 <div class="input">
-                    <p class="label">Thumbnail <span>*</span></p>
+                    <p class="label">Thumbnail <span>*</span>
+                        <RouterLink to="/ai">Use ThurbeAI</RouterLink>
+                    </p>
                     <div class="file_picker">
                         <img :src="video.thumbnail_file_url" alt="">
                         <div class="file_picker_text">
@@ -500,8 +502,15 @@ const uploadVideo = async () => {
     margin-bottom: 20px;
 }
 
+.label a {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
 .label span {
     color: rgba(255, 0, 102, 0.6);
+    margin-right: 4px;
 }
 
 .file_picker {
