@@ -95,7 +95,7 @@ const removeIndex = (index: number) => {
 }
 
 .error .icon {
-    background: #F5274E;
+    background: var(--sm-red);
 }
 
 .close {
