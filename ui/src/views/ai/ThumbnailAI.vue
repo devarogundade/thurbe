@@ -164,7 +164,7 @@ const download = () => {
     position: absolute;
     bottom: 20px;
     z-index: 1;
-    background: var(--primary);
+    background: var(--bg-darker);
     width: 40px;
     height: 40px;
     display: flex;
