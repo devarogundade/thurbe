@@ -11,7 +11,7 @@ import { Video } from './database/schemas/video';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Channel } from './database/schemas/channel';
 
-const TAKE_SIZE: number = 14;
+const TAKE_SIZE: number = 48;
 
 @Injectable()
 export class AppService {
