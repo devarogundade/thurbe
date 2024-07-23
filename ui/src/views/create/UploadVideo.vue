@@ -253,7 +253,7 @@ const uploadVideo = async () => {
 
                 <div class="input">
                     <p class="label">Thumbnail <span>*</span>
-                        <RouterLink to="/ai">Use ThurbeAI</RouterLink>
+                        <RouterLink to="/ai">Generate with ThurbeAI</RouterLink>
                     </p>
                     <div class="file_picker">
                         <img :src="video.thumbnail_file_url" alt="">
