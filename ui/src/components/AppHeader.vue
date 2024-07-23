@@ -60,9 +60,11 @@ const modal = useWeb3Modal();
                         <p>{{ Converter.fineAddress(walletStore.address, 5) }}</p>
                     </button>
 
-                    <div class="settings_btn" v-if="walletStore.account">
-                        <SettingsIcon />
-                    </div>
+                    <RouterLink to="/portfolio" v-if="walletStore.account">
+                        <div class="settings_btn">
+                            <SettingsIcon />
+                        </div>
+                    </RouterLink>
                 </div>
             </header>
         </div>
