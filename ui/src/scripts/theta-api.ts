@@ -5,7 +5,7 @@ const client = axios.create({
     baseURL: 'https://api.thetavideoapi.com',
     headers: {
         'x-tva-sa-id': import.meta.env.VITE_THETA_ID,
-        'x-tva-sa-secret': import.meta.env.VITE_TTHETA_SECRET,
+        'x-tva-sa-secret': import.meta.env.VITE_THETA_SECRET,
         'Content-Type': 'application/json'
     }
 });
