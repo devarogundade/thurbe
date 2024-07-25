@@ -34,7 +34,7 @@ const ThetaAPI = {
     async uploadVideo(
         name: string,
         file: File,
-        // nft_collection: string,
+        nft_collection?: string,
     ): Promise<Object | null> {
         try {
             const createURL = await client.post(`/upload`);
@@ -47,10 +47,16 @@ const ThetaAPI = {
                 }
             });
 
-            const options = {
+            const options = nft_collection ? {
                 "source_upload_id": data.id,
                 "playback_policy": "public",
-                // nft_collection,
+                nft_collection,
+                "metadata": {
+                    name
+                }
+            } : {
+                "source_upload_id": data.id,
+                "playback_policy": "public",
                 "metadata": {
                     name
                 }

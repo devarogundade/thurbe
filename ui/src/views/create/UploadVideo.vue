@@ -137,7 +137,10 @@ const uploadVideo = async () => {
         return;
     }
 
-    const videoResponse = await ThetaAPI.uploadVideo(video.value.name, video.value.file);
+    const videoResponse = await ThetaAPI.uploadVideo(
+        video.value.name,
+        video.value.file
+    );
 
     if (!videoResponse) {
         notify.push({
