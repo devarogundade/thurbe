@@ -8,4 +8,6 @@ Maximize Creator’s Revenue enabling them the potential to efficiently generate
 
 Enhance User Experience fulfilling a seamless and engaging user experience for both creators and consumers concurrently
 
+![gallery (2)](https://github.com/user-attachments/assets/6f34f8b5-9c31-4a03-8cc5-02246f8e2d1a)
+
 [Read more](https://devpost.com/software/thube)
