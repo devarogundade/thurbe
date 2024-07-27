@@ -73,6 +73,15 @@ const switchViewers = (viewerType: ViewerType) => {
 const showOption = ref<boolean>(true);
 
 const selectStreamType = (type: StreamType) => {
+    if (type == StreamType.Direct) {
+        notify.push({
+            title: 'WIP: Direct live screen share in progress',
+            description: 'Please try out external applications.',
+            category: 'error'
+        });
+        return;
+    }
+
     stream.value.streamType = type;
     showOption.value = false;
 };
