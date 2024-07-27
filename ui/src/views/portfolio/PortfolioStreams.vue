@@ -2,6 +2,7 @@
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
 import ProgressBox from '@/components/ProgressBox.vue';
 import PlayCircleIcon from '@/components/icons/PlayCircleIcon.vue';
+import RadarIcon from '@/components/icons/RadarIcon.vue';
 import { type Stream, type Account } from "@/types";
 import { onMounted, ref } from "vue";
 // @ts-ignore
@@ -42,7 +43,10 @@ onMounted(() => {
                     <div class="play_button">
                         <PlayCircleIcon />
                     </div>
-                    <p class="live" v-show="stream.live">Live</p>
+                    <div class="live" v-show="stream.live">
+                        <RadarIcon />
+                        <p>Live</p>
+                    </div>
                 </div>
                 <div class="detail">
                     <div class="detail_content">

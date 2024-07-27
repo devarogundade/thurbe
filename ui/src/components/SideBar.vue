@@ -113,7 +113,7 @@ const route = useRoute();
         <div class="links">
             <button class="support" @click="importThurbe">
                 <img src="/images/logo.png" alt="">
-                <p>{{ importing ? 'Importing' : '$THUB' }}</p>
+                <p>{{ importing ? 'Adding' : 'Add $THUB' }}</p>
             </button>
             <div class="socials">
                 <a href="#">
@@ -261,7 +261,9 @@ main {
 }
 
 .support {
-    width: 100%;
+    width: 169px;
+    max-width: 100%;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -271,10 +273,11 @@ main {
     border: none;
     height: 36px;
     border-radius: 6px;
+    background: var(--bg-dark);
 }
 
 .support:hover {
-    background: var(--bg-dark);
+    background: var(--bg-darker);
 }
 
 .support img {
@@ -284,7 +287,7 @@ main {
 
 .support p {
     font-weight: 500;
-    font-size: 16px;
+    font-size: 14px;
     margin-top: 2px;
     color: var(--tx-normal);
 }

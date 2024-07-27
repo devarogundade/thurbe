@@ -632,8 +632,8 @@ onBeforeUnmount(() => {
                     <h3>Oops, Sorry You are Ineligible to View this Content</h3>
                     <p>This channel owner only set this content to be to be viewable by followers only, Click the
                         button below to follow.</p>
-                    <button @click="follow">
-                        <FlashIcon />
+                    <button @click="follow" class="creator_follow_light">
+                        <UserAddIcon />
                         <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                     </button>
                 </div>
@@ -928,7 +928,7 @@ onBeforeUnmount(() => {
 
 .restricted button {
     margin-top: 30px;
-    width: 172px;
+    padding: 0 30px;
     height: 40px;
     gap: 12px;
     border-radius: 6px;
@@ -1140,8 +1140,13 @@ onBeforeUnmount(() => {
 }
 
 .creator_follow_light {
-    background: var(--primary-light);
+    background: var(--primary-light) !important;
 }
+
+.creator_follow_light p {
+    color: var(--tx-normal) !important;
+}
+
 
 .video_contents {
     margin-top: 30px;

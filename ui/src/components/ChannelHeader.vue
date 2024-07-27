@@ -151,7 +151,7 @@ const isCreator = (): boolean => {
                             <p>Following</p>
                         </button>
 
-                        <button v-else-if="!isFollow" @click="follow">
+                        <button v-else-if="!isFollow" @click="follow" class="creator_follow_light">
                             <UserAddIcon />
                             <p>{{ following ? 'Loading..' : 'Follow' }}</p>
                         </button>
@@ -321,6 +321,10 @@ const isCreator = (): boolean => {
     background: var(--bg-darker) !important;
     padding-right: 20px !important;
     overflow: hidden;
+}
+
+.creator_follow_light {
+    background: var(--primary-light) !important;
 }
 
 .creator_follow_icon {

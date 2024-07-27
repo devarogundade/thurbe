@@ -7,8 +7,6 @@ import RadarIcon from '@/components/icons/RadarIcon.vue';
 import { type Channel, type Account } from "@/types";
 import { onMounted, ref } from "vue";
 // @ts-ignore
-import { format as formatDate } from 'timeago.js';
-import Converter from '@/scripts/converter';
 import ThurbeAPI from '@/scripts/thurbe-api';
 import { useWalletStore } from '@/stores/wallet';
 const walletStore = useWalletStore();
@@ -51,7 +49,7 @@ onMounted(() => {
                         </div>
                     </div>
 
-                    <button class="follow_button"
+                    <button class="follow_button following_button"
                         v-if="walletStore.address && ((channel.owner as Account).followers as string[]).includes(walletStore.address.toLocaleLowerCase())">
                         <UserCheckIcon />
                         <p>Following</p>
@@ -177,6 +175,10 @@ onMounted(() => {
     border: none;
     cursor: pointer;
     user-select: none;
+}
+
+.following_button {
+    background: var(--bg-darker) !important;
 }
 
 .follow_button p {
