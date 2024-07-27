@@ -75,8 +75,8 @@ const showOption = ref<boolean>(true);
 const selectStreamType = (type: StreamType) => {
     if (type == StreamType.Direct) {
         notify.push({
-            title: 'WIP: Direct live screen share in progress',
-            description: 'Please try out external applications.',
+            title: 'WIP: Not available yet',
+            description: 'Please Use a Streaming Software.',
             category: 'error'
         });
         return;
