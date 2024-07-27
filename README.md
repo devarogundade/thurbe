@@ -12,4 +12,4 @@ Enhance User Experience fulfilling a seamless and engaging user experience for b
 
 [Read more](https://devpost.com/software/thube)
 
-![Revenue Transfer Demo](https://github.com/user-attachments/assets/35140d2a-9911-4e6a-8949-c0669a0f3372)
+![Thurbe Revenue Transfer Demo](https://github.com/user-attachments/assets/c72c7d95-3ee1-4fc0-997d-87829431bdae)
