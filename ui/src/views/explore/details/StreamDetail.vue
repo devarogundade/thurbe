@@ -479,10 +479,10 @@ const init = async () => {
         payable.value = isSuperFollow.value;
     }
 
-    if (stream.value?.streamer == walletStore.address) {
+    if (isCreator()) {
         payable.value = true;
     }
-
+    
     videoUrl.value = await ThetaAPI.getStreamUrl(stream.value?.thetaId!);
 
     if (payable.value && videoPlayer.value && videoUrl.value && stream.value?.live) {
