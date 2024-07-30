@@ -12,5 +12,4 @@ Enhance User Experience fulfilling a seamless and engaging user experience for b
 
 [Read more](https://devpost.com/software/thube)
 
-https://github.com/user-attachments/assets/67a10b02-d47d-43ea-9bb5-a3e4ba701e68
-
+![Write up Architecture Img](https://github.com/user-attachments/assets/397ee6a9-ce39-4668-bb1a-abc305925b3b)
