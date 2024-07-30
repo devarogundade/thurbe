@@ -351,7 +351,7 @@ const uploadVideo = async () => {
                                 <UserGroupIcon />
                             </div>
                             <div class="video_contents_stat_text">
-                                <p>Views</p>
+                                <p>Viewers</p>
                                 <h3>----</h3>
                             </div>
                         </div>
